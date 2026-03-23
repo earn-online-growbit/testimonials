@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — EarnOnline CMS</title>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0F1117;--bg2:#161B26;--bg3:#1E2535;--bg4:#252D3E;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --orange:#E8621A;--orange-dk:#C4501A;--orange-sf:rgba(232,98,26,.12);
+  --green:#25D366;--red:#EF4444;--red-sf:rgba(239,68,68,.12);
+  --blue:#3B82F6;--blue-sf:rgba(59,130,246,.12);
+  --text:#F0F4FF;--text2:#A0AABF;--text3:#5C6880;
+  --ff-h:'Syne',sans-serif;--ff-b:'DM Sans',sans-serif;
+  --r:10px;--r-lg:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--ff-b)}
+body{background:var(--bg);color:var(--text);overflow:hidden}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;outline:none;font-family:var(--ff-b)}
+input,textarea,select{font-family:var(--ff-b)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+
+/* LOGIN */
+#loginPage{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+#loginPage.hidden{display:none}
+.login-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:44px 40px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.login-logo{font-family:var(--ff-h);font-size:1.6rem;font-weight:800;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.login-logo span{color:var(--orange)}
+.login-sub{font-size:.82rem;color:var(--text3);margin-bottom:36px}
+.login-label{display:block;font-size:.75rem;font-weight:600;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.login-input{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.9rem;padding:12px 15px;transition:border-color .2s;margin-bottom:18px}
+.login-input:focus{outline:none;border-color:var(--orange)}
+.login-input::placeholder{color:var(--text3)}
+.login-btn{width:100%;background:var(--orange);color:#fff;padding:14px;border-radius:var(--r);font-size:.95rem;font-weight:700;font-family:var(--ff-h);transition:background .2s,transform .15s;margin-top:8px}
+.login-btn:hover{background:var(--orange-dk);transform:translateY(-1px)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.login-err{background:var(--red-sf);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;font-size:.8rem;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none}
+.login-err.show{display:block}
+.login-hint{font-size:.72rem;color:var(--text3);text-align:center;margin-top:20px;line-height:1.6}
+
+/* APP */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:row}
+#app.active{display:flex}
+.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:22px 20px 18px;font-family:var(--ff-h);font-size:1.15rem;font-weight:800;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sb-logo span{color:var(--orange)}
+.sb-logo .badge{background:var(--orange-sf);color:var(--orange);font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:100px;margin-left:auto;font-family:var(--ff-b);letter-spacing:.06em}
+.sb-section{padding:16px 12px 6px;font-size:.65rem;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.sb-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r);font-size:.85rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .18s;margin:1px 6px}
+.sb-link:hover{background:var(--bg3);color:var(--text)}
+.sb-link.act{background:var(--orange-sf);color:var(--orange);font-weight:600}
+.sb-link .ico{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.sb-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.sb-logout{display:flex;align-items:center;gap:8px;background:var(--red-sf);color:#FCA5A5;padding:10px 14px;border-radius:var(--r);font-size:.83rem;font-weight:600;border:1px solid rgba(239,68,68,.18);transition:all .2s;width:100%}
+.sb-logout:hover{background:rgba(239,68,68,.2)}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100}
+.topbar-title{font-family:var(--ff-h);font-size:1.15rem;font-weight:700;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.25);color:#4ade80;font-size:.73rem;font-weight:600;padding:6px 12px;border-radius:100px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.topbar-user{font-size:.8rem;color:var(--text2)}
+.content{padding:28px;flex:1}
+.panel{display:none}.panel.act{display:block}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
+.stat-card-icon{font-size:1.6rem;margin-bottom:10px}
+.stat-card-num{font-family:var(--ff-h);font-size:1.8rem;font-weight:800;color:var(--text)}
+.stat-card-lbl{font-size:.75rem;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+
+/* HEADERS */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.sec-hd-title{font-family:var(--ff-h);font-size:1rem;font-weight:700;color:var(--text)}
+.sec-hd-sub{font-size:.78rem;color:var(--text3);margin-top:2px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:.82rem;font-weight:600;transition:all .2s;cursor:pointer}
+.btn-orange{background:var(--orange);color:#fff}
+.btn-orange:hover{background:var(--orange-dk)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-red{background:var(--red-sf);color:#FCA5A5;border:1px solid rgba(239,68,68,.18)}
+.btn-red:hover{background:rgba(239,68,68,.2)}
+.btn-blue{background:var(--blue-sf);color:#93C5FD;border:1px solid rgba(59,130,246,.2)}
+.btn-blue:hover{background:rgba(59,130,246,.2)}
+.btn-sm{padding:6px 12px;font-size:.75rem}
+.btn-xs{padding:4px 9px;font-size:.7rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* FORM */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.73rem;font-weight:600;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
+.input,.textarea,.select{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r);color:var(--text);font-size:.87rem;padding:10px 13px;transition:border-color .2s}
+.input:focus,.textarea:focus,.select:focus{outline:none;border-color:var(--orange)}
+.input::placeholder,.textarea::placeholder{color:var(--text3)}
+.textarea{resize:vertical;min-height:80px;line-height:1.5}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C6880' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.hint{font-size:.72rem;color:var(--text3);margin-top:6px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.card-body{padding:20px}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed rgba(232,98,26,.35);border-radius:var(--r-lg);padding:32px 20px;text-align:center;cursor:pointer;background:var(--orange-sf);transition:all .2s;margin-bottom:12px;position:relative}
+.upload-zone:hover{border-color:var(--orange);background:rgba(232,98,26,.15)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone-text{font-size:.83rem;color:var(--text2);pointer-events:none}
+.upload-zone-text strong{color:var(--orange)}
+.prog-wrap{height:5px;background:var(--bg3);border-radius:100px;margin-top:10px;overflow:hidden;display:none}
+.prog-bar{height:100%;width:0;background:var(--orange);border-radius:100px;transition:width .3s}
+
+/* PREVIEW GRID */
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:16px}
+.preview-item{position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg3);border:1px solid var(--border)}
+.preview-item img{width:100%;aspect-ratio:1;object-fit:cover}
+.preview-item-meta{padding:8px 10px}
+.preview-item-name{font-size:.72rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preview-del{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(15,17,23,.8);color:#FCA5A5;display:flex;align-items:center;justify-content:center;font-size:.8rem;cursor:pointer;border:1px solid rgba(239,68,68,.3)}
+.preview-del:hover{background:var(--red)}
+.preview-edit{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:50%;background:rgba(15,17,23,.8);color:#93C5FD;display:flex;align-items:center;justify-content:center;font-size:.75rem;cursor:pointer;border:1px solid rgba(59,130,246,.3)}
+
+/* TABLE */
+.dtable{width:100%;border-collapse:collapse}
+.dtable th{text-align:left;font-size:.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
+.dtable td{padding:12px 14px;font-size:.82rem;color:var(--text2);border-bottom:1px solid var(--border);vertical-align:middle}
+.dtable tr:last-child td{border-bottom:none}
+.dtable tr:hover td{background:var(--bg3)}
+.dtable-av{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3)}
+.dtable-thumb{width:52px;height:40px;border-radius:6px;object-fit:cover;background:var(--bg3)}
+.tag{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.68rem;font-weight:600}
+.tag-orange{background:var(--orange-sf);color:var(--orange)}
+.tag-blue{background:var(--blue-sf);color:#93C5FD}
+.tag-green{background:rgba(37,211,102,.12);color:#4ade80}
+.tag-red{background:var(--red-sf);color:#FCA5A5}
+.act-btns{display:flex;gap:6px;flex-wrap:wrap}
+.table-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border)}
+
+/* DIALOG */
+.dlg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.dlg-overlay.open{display:flex}
+.dlg{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);width:100%;max-width:520px;box-shadow:0 32px 80px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto}
+.dlg-head{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.dlg-head-title{font-family:var(--ff-h);font-size:.95rem;font-weight:700;color:var(--text)}
+.dlg-x{width:30px;height:30px;border-radius:50%;background:var(--bg3);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.dlg-x:hover{background:var(--bg4)}
+.dlg-body{padding:22px}
+.dlg-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--bg2)}
+.img-prev-wrap{display:none;margin-top:10px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border);max-height:180px}
+.img-prev-wrap img{width:100%;height:180px;object-fit:cover}
+
+/* TOAST */
+.toast-stack{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:12px 18px;border-radius:var(--r);font-size:.83rem;font-weight:500;display:flex;align-items:center;gap:10px;transform:translateX(120%);transition:transform .3s;min-width:240px;max-width:320px}
+.toast.show{transform:none}
+.toast.success{border-color:rgba(74,222,128,.3)}
+.toast.error{border-color:rgba(239,68,68,.3)}
+
+/* CHAT PREVIEW */
+.chat-preview{background:#ECE5DD;border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto}
+.cprev{max-width:80%;display:flex;flex-direction:column;gap:3px}
+.cprev.incoming{align-self:flex-start}.cprev.outgoing{align-self:flex-end}
+.cprev-bubble{padding:8px 12px;border-radius:10px;font-size:.82rem;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.cprev.incoming .cprev-bubble{background:#fff;color:#2C1810;border-radius:0 10px 10px 10px}
+.cprev.outgoing .cprev-bubble{background:#DCF8C6;color:#2C1810;border-radius:10px 10px 0 10px}
+.cprev-earn{background:#E8621A;color:#fff;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:100px;display:inline-flex;align-items:center;gap:4px;margin-top:3px}
+.cprev-sender{font-size:.68rem;font-weight:600;color:#E8621A;padding-left:3px;margin-bottom:1px}
+
+@media(max-width:900px){.sidebar{width:200px}.form-row{grid-template-columns:1fr}}
+@media(max-width:680px){
+  body{overflow:auto}
+  #app.active{flex-direction:column;height:auto}
+  .sidebar{width:100%;height:auto;flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .sb-logo,.sb-section,.sb-footer{display:none}
+  .sb-link{flex-direction:column;gap:3px;font-size:.62rem;padding:10px 8px;min-width:64px}
+  .sb-link .ico{font-size:1.1rem}
+  .main{overflow:visible}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">🔒 <span>Earn</span>Online Admin</div>
+    <p class="login-sub">Secure admin access · Supabase Authentication</p>
+    <div class="login-err" id="loginErr"></div>
+    <label class="login-label">Email</label>
+    <input type="email" class="login-input" id="loginEmail" placeholder="admin@example.com" autocomplete="email"/>
+    <label class="login-label">Password</label>
+    <input type="password" class="login-input" id="loginPass" placeholder="••••••••" autocomplete="current-password"/>
+    <button class="login-btn" id="loginBtn">Sign In to Dashboard</button>
+    <p class="login-hint">Create your admin account in Supabase → Authentication → Users.<br/>This panel is hidden from the public website.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-logo">⚡ <span>Earn</span>Admin <span class="badge">LIVE</span></div>
+    <div class="sb-section">Overview</div>
+    <div class="sb-link act" data-panel="dashboard"><span class="ico">📊</span>Dashboard</div>
+    <div class="sb-section">Content</div>
+    <div class="sb-link" data-panel="hero"><span class="ico">🎯</span>Hero Section</div>
+    <div class="sb-link" data-panel="whatsapp"><span class="ico">📱</span>WhatsApp</div>
+    <div class="sb-link" data-panel="marquee"><span class="ico">📢</span>Ticker Marquee</div>
+    <div class="sb-section">Media</div>
+    <div class="sb-link" data-panel="gallery"><span class="ico">🖼️</span>Gallery</div>
+    <div class="sb-link" data-panel="videos"><span class="ico">🎬</span>Videos</div>
+    <div class="sb-link" data-panel="carousel"><span class="ico">🎠</span>Carousel</div>
+    <div class="sb-section">Testimonials</div>
+    <div class="sb-link" data-panel="testimonials"><span class="ico">⭐</span>Testimonials</div>
+    <div class="sb-link" data-panel="chat"><span class="ico">💬</span>Chat Messages</div>
+    <div class="sb-footer"><button class="sb-logout" id="logoutBtn">🚪 Sign Out</button></div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-right">
+        <div class="live-badge"><div class="live-dot"></div>Live · Supabase</div>
+        <div class="topbar-user" id="topbarUser"></div>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="panel act" id="panel-dashboard">
+        <div class="stats-row" id="dashStats">
+          <div class="stat-card"><div class="stat-card-icon">⭐</div><div class="stat-card-num" id="ds-test">—</div><div class="stat-card-lbl">Testimonials</div></div>
+          <div class="stat-card"><div class="stat-card-icon">🖼️</div><div class="stat-card-num" id="ds-media">—</div><div class="stat-card-lbl">Gallery Items</div></div>
+          <div class="stat-card"><div class="stat-card-icon">🎬</div><div class="stat-card-num" id="ds-vid">—</div><div class="stat-card-lbl">Videos</div></div>
+          <div class="stat-card"><div class="stat-card-icon">💬</div><div class="stat-card-num" id="ds-chat">—</div><div class="stat-card-lbl">Chat Messages</div></div>
+          <div class="stat-card"><div class="stat-card-icon">📢</div><div class="stat-card-num" id="ds-marq">—</div><div class="stat-card-lbl">Ticker Items</div></div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;margin-bottom:16px">
+          <h3 style="font-family:var(--ff-h);font-size:.95rem;font-weight:700;margin-bottom:16px">🚀 Quick Actions</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-orange" onclick="showPanel('testimonials');openTestDlg()">+ Testimonial</button>
+            <button class="btn btn-blue" onclick="showPanel('gallery')">+ Gallery Image</button>
+            <button class="btn btn-ghost" onclick="showPanel('chat');openChatDlg()">+ Chat Message</button>
+            <button class="btn btn-ghost" onclick="showPanel('videos');openVideoDlg()">+ Video</button>
+          </div>
+        </div>
+        <div style="background:var(--orange-sf);border:1px solid rgba(232,98,26,.3);border-radius:var(--r-lg);padding:18px 20px;font-size:.82rem;color:var(--text2)">
+          <strong style="color:var(--orange)">ℹ️ Setup Note:</strong> Make sure you've run <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">schema.sql</code> in Supabase SQL Editor and enabled Realtime for all tables in Dashboard → Database → Replication.
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="panel" id="panel-hero">
+        <div class="sec-hd"><div><div class="sec-hd-title">Hero Section</div><div class="sec-hd-sub">Changes reflect instantly on the public page</div></div></div>
+        <div class="card"><div class="card-body">
+          <div class="field"><label>Headline (HTML allowed)</label><textarea class="textarea" id="heroHeadline" rows="3"></textarea><div class="hint">Use &lt;br/&gt; for line breaks, &lt;span&gt; for orange color.</div></div>
+          <div class="field"><label>Subheading</label><textarea class="textarea" id="heroSubheading" rows="3"></textarea></div>
+          <div class="field"><label>CTA Button Text</label><input class="input" id="heroCtaText" type="text"/></div>
+          <button class="btn btn-orange" id="saveHeroBtn">💾 Save Hero Section</button>
+        </div></div>
+      </div>
+
+      <!-- WHATSAPP -->
+      <div class="panel" id="panel-whatsapp">
+        <div class="sec-hd"><div><div class="sec-hd-title">WhatsApp &amp; Site Settings</div></div></div>
+        <div class="card"><div class="card-body">
+          <div class="field"><label>WhatsApp Number (with country code, no +)</label><input class="input" id="waPhone" type="text" placeholder="919999999999"/></div>
+          <div class="field"><label>Auto Message Text</label><textarea class="textarea" id="waMessage" rows="3"></textarea></div>
+          <div style="background:var(--bg3);border-radius:var(--r);padding:14px;margin-bottom:16px">
+            <div style="font-size:.72rem;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Preview Link</div>
+            <div id="waLinkPreview" style="font-size:.78rem;color:var(--orange);word-break:break-all"></div>
+          </div>
+          <div class="field"><label>Site Name</label><input class="input" id="siteName" type="text" placeholder="EarnOnline.in"/></div>
+          <button class="btn btn-orange" id="saveWaBtn">💾 Save Settings</button>
+        </div></div>
+      </div>
+
+      <!-- MARQUEE -->
+      <div class="panel" id="panel-marquee">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Ticker Marquee <span class="tag tag-orange" id="marqCount">0</span></div></div>
+          <button class="btn btn-orange btn-sm" onclick="openMarqDlg()">+ Add Item</button>
+        </div>
+        <div class="table-wrap"><table class="dtable"><tbody id="marqTable"></tbody></table></div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="panel" id="panel-gallery">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Gallery <span class="tag tag-orange" id="galCount">0</span></div></div>
+          <button class="btn btn-orange btn-sm" onclick="openDlg('galUploadDlg')">+ Upload Images</button>
+        </div>
+        <div class="preview-grid" id="galPreviewGrid"></div>
+      </div>
+
+      <!-- VIDEOS -->
+      <div class="panel" id="panel-videos">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Video Testimonials <span class="tag tag-orange" id="vidCount">0</span></div></div>
+          <button class="btn btn-orange btn-sm" onclick="openVideoDlg()">+ Add Video</button>
+        </div>
+        <div class="table-wrap"><table class="dtable"><tbody id="vidTable"></tbody></table></div>
+      </div>
+
+      <!-- CAROUSEL -->
+      <div class="panel" id="panel-carousel">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Video Carousel <span class="tag tag-orange" id="carCount">0</span></div></div>
+          <button class="btn btn-orange btn-sm" onclick="openCarDlg()">+ Add Item</button>
+        </div>
+        <div class="table-wrap"><table class="dtable"><tbody id="carTable"></tbody></table></div>
+      </div>
+
+      <!-- TESTIMONIALS -->
+      <div class="panel" id="panel-testimonials">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Testimonials <span class="tag tag-orange" id="testCount">0</span></div></div>
+          <button class="btn btn-orange btn-sm" onclick="openTestDlg()">+ Add Testimonial</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="testCatFilter">
+          <button class="btn btn-ghost btn-sm act" onclick="filterTest('all',this)">All</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterTest('housewives',this)">🏠 Housewives</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterTest('students',this)">🎓 Students</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterTest('professionals',this)">💼 Professionals</button>
+        </div>
+        <div class="table-wrap"><table class="dtable"><tbody id="testTable"></tbody></table></div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="panel" id="panel-chat">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Chat Messages <span class="tag tag-orange" id="chatCount">0</span></div></div>
+          <button class="btn btn-orange btn-sm" onclick="openChatDlg()">+ Add Message</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+          <div class="table-wrap"><table class="dtable"><tbody id="chatTable"></tbody></table></div>
+          <div>
+            <div style="font-size:.78rem;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em">Live Preview</div>
+            <div class="chat-preview" id="chatPreview"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ════ DIALOGS ════ -->
+
+<!-- MARQUEE DLG -->
+<div class="dlg-overlay" id="marqDlg">
+  <div class="dlg">
+    <div class="dlg-head"><div class="dlg-head-title" id="marqDlgTitle">New Ticker Item</div><button class="dlg-x" onclick="closeDlg('marqDlg')">✕</button></div>
+    <div class="dlg-body">
+      <input type="hidden" id="marqDlgId"/>
+      <div class="field"><label>Name</label><input class="input" id="marqDlgName" placeholder="Priya S."/></div>
+      <div class="field"><label>Text</label><input class="input" id="marqDlgText" placeholder="earned ₹18,500 this month"/></div>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('marqDlg')">Cancel</button><button class="btn btn-orange" id="marqDlgSave">Save</button></div>
+  </div>
+</div>
+
+<!-- GALLERY UPLOAD DLG -->
+<div class="dlg-overlay" id="galUploadDlg">
+  <div class="dlg">
+    <div class="dlg-head"><div class="dlg-head-title">Upload Gallery Images</div><button class="dlg-x" onclick="closeDlg('galUploadDlg')">✕</button></div>
+    <div class="dlg-body">
+      <div class="upload-zone"><input type="file" id="galFileInput" accept="image/*" multiple/><div style="pointer-events:none"><div style="font-size:2rem;margin-bottom:8px">🖼️</div><div class="upload-zone-text"><strong>Click to select</strong> or drag &amp; drop · multiple files OK</div></div></div>
+      <div class="prog-wrap" id="galProg"><div class="prog-bar" id="galProgBar"></div></div>
+      <div style="font-size:.72rem;color:var(--text3);margin-top:8px" id="galUploadStatus"></div>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('galUploadDlg')">Close</button></div>
+  </div>
+</div>
+
+<!-- GALLERY EDIT DLG -->
+<div class="dlg-overlay" id="galEditDlg">
+  <div class="dlg">
+    <div class="dlg-head"><div class="dlg-head-title">Edit Caption</div><button class="dlg-x" onclick="closeDlg('galEditDlg')">✕</button></div>
+    <div class="dlg-body">
+      <input type="hidden" id="galEditId"/>
+      <div class="field"><label>Caption / Earning Text</label><input class="input" id="galEditCaption" placeholder="₹12,500 earned"/></div>
+      <div class="img-prev-wrap" id="galEditPreviewWrap"><img id="galEditPreview" src="" alt=""/></div>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('galEditDlg')">Cancel</button><button class="btn btn-orange" id="galEditSaveBtn">Save Caption</button></div>
+  </div>
+</div>
+
+<!-- VIDEO DLG -->
+<div class="dlg-overlay" id="vidDlg">
+  <div class="dlg">
+    <div class="dlg-head"><div class="dlg-head-title" id="vidDlgTitle">Add Video</div><button class="dlg-x" onclick="closeDlg('vidDlg')">✕</button></div>
+    <div class="dlg-body">
+      <input type="hidden" id="vidDlgId"/>
+      <div class="form-row">
+        <div class="field"><label>Name</label><input class="input" id="vidDlgName" placeholder="Priya Sharma"/></div>
+        <div class="field"><label>Location</label><input class="input" id="vidDlgLoc" placeholder="Jaipur, Rajasthan"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Earning</label><input class="input" id="vidDlgEarn" placeholder="₹18,500/mo"/></div>
+        <div class="field"><label>Duration</label><input class="input" id="vidDlgDur" placeholder="2:34"/></div>
+      </div>
+      <div class="field"><label>Thumbnail Image</label>
+        <div class="upload-zone" style="padding:20px"><input type="file" id="vidDlgImgFile" accept="image/*"/><div style="pointer-events:none;font-size:.82rem;color:var(--text2)">📷 Select thumbnail image</div></div>
+        <input class="input" id="vidDlgImgUrl" placeholder="Or paste image URL" style="margin-top:8px"/>
+        <div class="img-prev-wrap" id="vidDlgImgPrev"><img id="vidDlgImgPrevImg" src="" alt=""/></div>
+      </div>
+      <div class="field"><label>Video File</label>
+        <div class="upload-zone" style="padding:20px"><input type="file" id="vidDlgVidFile" accept="video/*"/><div style="pointer-events:none;font-size:.82rem;color:var(--text2)">🎬 Select video file (MP4, WebM)</div></div>
+        <input class="input" id="vidDlgVidUrl" placeholder="Or paste video URL" style="margin-top:8px"/>
+      </div>
+      <div class="prog-wrap" id="vidProg"><div class="prog-bar" id="vidProgBar"></div></div>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('vidDlg')">Cancel</button><button class="btn btn-orange" id="vidDlgSave">Save</button></div>
+  </div>
+</div>
+
+<!-- CAROUSEL DLG -->
+<div class="dlg-overlay" id="carDlg">
+  <div class="dlg">
+    <div class="dlg-head"><div class="dlg-head-title" id="carDlgTitle">Add Carousel Item</div><button class="dlg-x" onclick="closeDlg('carDlg')">✕</button></div>
+    <div class="dlg-body">
+      <input type="hidden" id="carDlgId"/>
+      <div class="form-row">
+        <div class="field"><label>Name</label><input class="input" id="carDlgName" placeholder="Ravi Singh"/></div>
+        <div class="field"><label>Location</label><input class="input" id="carDlgLoc" placeholder="Patna, Bihar"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Earning</label><input class="input" id="carDlgEarn" placeholder="₹16,200/mo"/></div>
+        <div class="field"><label>Duration</label><input class="input" id="carDlgDur" placeholder="3:20"/></div>
+      </div>
+      <div class="field"><label>Thumbnail</label>
+        <div class="upload-zone" style="padding:20px"><input type="file" id="carDlgImgFile" accept="image/*"/><div style="pointer-events:none;font-size:.82rem;color:var(--text2)">📷 Select thumbnail</div></div>
+        <input class="input" id="carDlgImgUrl" placeholder="Or paste image URL" style="margin-top:8px"/>
+        <div class="img-prev-wrap" id="carDlgImgPrev"><img id="carDlgImgPrevImg" src="" alt=""/></div>
+      </div>
+      <div class="field"><label>Video File</label>
+        <div class="upload-zone" style="padding:20px"><input type="file" id="carDlgVidFile" accept="video/*"/><div style="pointer-events:none;font-size:.82rem;color:var(--text2)">🎬 Select video</div></div>
+        <input class="input" id="carDlgVidUrl" placeholder="Or paste video URL" style="margin-top:8px"/>
+      </div>
+      <div class="prog-wrap" id="carProg"><div class="prog-bar" id="carProgBar"></div></div>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('carDlg')">Cancel</button><button class="btn btn-orange" id="carDlgSave">Save</button></div>
+  </div>
+</div>
+
+<!-- TESTIMONIAL DLG -->
+<div class="dlg-overlay" id="testDlg">
+  <div class="dlg">
+    <div class="dlg-head"><div class="dlg-head-title" id="testDlgTitle">Add Testimonial</div><button class="dlg-x" onclick="closeDlg('testDlg')">✕</button></div>
+    <div class="dlg-body">
+      <input type="hidden" id="testDlgId"/>
+      <div class="form-row">
+        <div class="field"><label>Name</label><input class="input" id="testDlgName" placeholder="Priya S."/></div>
+        <div class="field"><label>Location</label><input class="input" id="testDlgLoc" placeholder="Jaipur"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Category</label>
+          <select class="select" id="testDlgCat">
+            <option value="housewives">🏠 Housewives</option>
+            <option value="students">🎓 Students</option>
+            <option value="professionals">💼 Professionals</option>
+          </select>
+        </div>
+        <div class="field"><label>Earning / Amount</label><input class="input" id="testDlgAmount" placeholder="₹18,500/mo"/></div>
+      </div>
+      <div class="field"><label>Quote / Text</label><textarea class="textarea" id="testDlgQuote" rows="3" placeholder="I never thought I could earn sitting at home..."></textarea></div>
+      <div class="field"><label>Avatar Image</label>
+        <div class="upload-zone" style="padding:20px"><input type="file" id="testDlgImgFile" accept="image/*"/><div style="pointer-events:none;font-size:.82rem;color:var(--text2)">📷 Select avatar image</div></div>
+        <input class="input" id="testDlgImgUrl" placeholder="Or paste image URL" style="margin-top:8px"/>
+        <div class="img-prev-wrap" id="testDlgImgPrev"><img id="testDlgImgPrevImg" src="" alt=""/></div>
+      </div>
+      <div class="prog-wrap" id="testProg"><div class="prog-bar" id="testProgBar"></div></div>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('testDlg')">Cancel</button><button class="btn btn-orange" id="testDlgSave">Save</button></div>
+  </div>
+</div>
+
+<!-- CHAT DLG -->
+<div class="dlg-overlay" id="chatDlg">
+  <div class="dlg">
+    <div class="dlg-head"><div class="dlg-head-title" id="chatDlgTitle">Add Message</div><button class="dlg-x" onclick="closeDlg('chatDlg')">✕</button></div>
+    <div class="dlg-body">
+      <input type="hidden" id="chatDlgId"/>
+      <div class="form-row">
+        <div class="field"><label>Direction</label>
+          <select class="select" id="chatDlgDir"><option value="incoming">← Incoming</option><option value="outgoing">→ Outgoing</option></select>
+        </div>
+        <div class="field"><label>Sender Name</label><input class="input" id="chatDlgSender" placeholder="Priya S."/></div>
+      </div>
+      <div class="field"><label>Message</label><textarea class="textarea" id="chatDlgMsg" rows="3" placeholder="Bhai pehla payment aa gaya! 😭🙏"></textarea></div>
+      <div class="form-row">
+        <div class="field"><label>Earn Badge (optional)</label><input class="input" id="chatDlgEarn" placeholder="₹5,200 First Payment"/></div>
+        <div class="field"><label>Time Label</label><input class="input" id="chatDlgTime" placeholder="9:14 AM"/></div>
+      </div>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('chatDlg')">Cancel</button><button class="btn btn-orange" id="chatDlgSave">Save</button></div>
+  </div>
+</div>
+
+<!-- CONFIRM DLG -->
+<div class="dlg-overlay" id="confirmDlg">
+  <div class="dlg" style="max-width:380px">
+    <div class="dlg-head"><div class="dlg-head-title">Confirm Delete</div><button class="dlg-x" onclick="closeDlg('confirmDlg')">✕</button></div>
+    <div class="dlg-body"><p id="confirmMsg" style="font-size:.9rem;color:var(--text2)">Are you sure you want to delete this item?</p></div>
+    <div class="dlg-foot"><button class="btn btn-ghost" onclick="closeDlg('confirmDlg')">Cancel</button><button class="btn btn-red" id="confirmOk">Delete</button></div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<!-- ═══════════ SUPABASE SDK ═══════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+/* ════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════ */
+const supa = getClient();
+
+/* ════════════════════════════════════════
+   UTILITIES
+   ════════════════════════════════════════ */
+function toast(msg, type='success'){
+  const s=document.getElementById('toastStack');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`; t.textContent=msg;
+  s.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),350); },3200);
+}
+function openDlg(id){ document.getElementById(id).classList.add('open'); }
+function closeDlg(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.dlg-overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.classList.remove('open'); });
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.dlg-overlay.open').forEach(x=>x.classList.remove('open')); });
+
+/* ════════════════════════════════════════
+   AUTH
+   ════════════════════════════════════════ */
+supa.auth.onAuthStateChange((event, session)=>{
+  if(session){
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('app').classList.add('active');
+    document.getElementById('topbarUser').textContent = session.user.email;
+    loadAllData();
+    setupRealtimeAdmin();
+    loadSettingsPanels();
+  } else {
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('app').classList.remove('active');
+  }
+});
+
+document.getElementById('loginBtn').addEventListener('click', async ()=>{
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  const btn=document.getElementById('loginBtn');
+  err.classList.remove('show');
+  if(!email||!pass){ err.textContent='Please enter email and password.'; err.classList.add('show'); return; }
+  btn.disabled=true; btn.textContent='Signing in…';
+  const {error}=await supa.auth.signInWithPassword({email,password:pass});
+  if(error){ err.textContent=error.message; err.classList.add('show'); }
+  btn.disabled=false; btn.textContent='Sign In to Dashboard';
+});
+document.getElementById('loginPass').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('loginBtn').click(); });
+document.getElementById('logoutBtn').addEventListener('click',()=>supa.auth.signOut());
+
+/* ════════════════════════════════════════
+   NAVIGATION
+   ════════════════════════════════════════ */
+const panelTitles={dashboard:'Dashboard',hero:'Hero Section',whatsapp:'Settings',marquee:'Ticker Marquee',gallery:'Gallery',videos:'Videos',carousel:'Carousel',testimonials:'Testimonials',chat:'Chat Messages'};
+function showPanel(name){
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('act'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('act'));
+  document.querySelector(`.sb-link[data-panel="${name}"]`)?.classList.add('act');
+  document.getElementById(`panel-${name}`)?.classList.add('act');
+  document.getElementById('topbarTitle').textContent=panelTitles[name]||name;
+}
+document.querySelectorAll('.sb-link[data-panel]').forEach(l=>l.addEventListener('click',()=>showPanel(l.dataset.panel)));
+
+/* ════════════════════════════════════════
+   STORAGE UPLOAD
+   ════════════════════════════════════════ */
+async function uploadToStorage(file, bucket, progBar, progWrap){
+  const ext=file.name.split('.').pop();
+  const path=`${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  if(progWrap) progWrap.style.display='block';
+  const {data,error}=await supa.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type});
+  if(error) throw error;
+  const {data:{publicUrl}}=supa.storage.from(bucket).getPublicUrl(data.path);
+  if(progBar){ progBar.style.width='100%'; setTimeout(()=>{ progWrap.style.display='none'; progBar.style.width='0'; },800); }
+  return publicUrl;
+}
+
+/* ════════════════════════════════════════
+   DATA LOADING
+   ════════════════════════════════════════ */
+let _data={ testimonials:[], media:[], videos:[], carousel:[], chat:[], marquee:[] };
+let _testFilter='all';
+
+async function loadAllData(){
+  const [t,m,v,c,ch,mq]=await Promise.all([
+    supa.from('testimonials').select('*').order('sort_order'),
+    supa.from('media').select('*').order('sort_order'),
+    supa.from('videos').select('*').order('sort_order'),
+    supa.from('carousel_videos').select('*').order('sort_order'),
+    supa.from('chat_messages').select('*').order('sort_order'),
+    supa.from('marquee_items').select('*').order('sort_order'),
+  ]);
+  _data.testimonials=t.data||[];
+  _data.media=m.data||[];
+  _data.videos=v.data||[];
+  _data.carousel=c.data||[];
+  _data.chat=ch.data||[];
+  _data.marquee=mq.data||[];
+  renderAll();
+}
+
+function renderAll(){
+  renderDashStats();
+  renderMarqTable();
+  renderGalGrid();
+  renderVidTable('videos','vidTable','vidCount');
+  renderVidTable('carousel','carTable','carCount');
+  renderTestTable();
+  renderChatPanel();
+}
+
+function renderDashStats(){
+  document.getElementById('ds-test').textContent=_data.testimonials.length;
+  document.getElementById('ds-media').textContent=_data.media.length;
+  document.getElementById('ds-vid').textContent=_data.videos.length;
+  document.getElementById('ds-chat').textContent=_data.chat.length;
+  document.getElementById('ds-marq').textContent=_data.marquee.length;
+}
+
+/* ════════════════════════════════════════
+   REALTIME (admin side — refreshes local data)
+   ════════════════════════════════════════ */
+function setupRealtimeAdmin(){
+  supa.channel('admin-rt')
+    .on('postgres_changes',{event:'*',schema:'public',table:'testimonials'},   async ()=>{ const r=await supa.from('testimonials').select('*').order('sort_order'); _data.testimonials=r.data||[]; renderTestTable(); renderDashStats(); })
+    .on('postgres_changes',{event:'*',schema:'public',table:'media'},          async ()=>{ const r=await supa.from('media').select('*').order('sort_order'); _data.media=r.data||[]; renderGalGrid(); renderDashStats(); })
+    .on('postgres_changes',{event:'*',schema:'public',table:'videos'},         async ()=>{ const r=await supa.from('videos').select('*').order('sort_order'); _data.videos=r.data||[]; renderVidTable('videos','vidTable','vidCount'); renderDashStats(); })
+    .on('postgres_changes',{event:'*',schema:'public',table:'carousel_videos'},async ()=>{ const r=await supa.from('carousel_videos').select('*').order('sort_order'); _data.carousel=r.data||[]; renderVidTable('carousel','carTable','carCount'); })
+    .on('postgres_changes',{event:'*',schema:'public',table:'chat_messages'},  async ()=>{ const r=await supa.from('chat_messages').select('*').order('sort_order'); _data.chat=r.data||[]; renderChatPanel(); renderDashStats(); })
+    .on('postgres_changes',{event:'*',schema:'public',table:'marquee_items'},  async ()=>{ const r=await supa.from('marquee_items').select('*').order('sort_order'); _data.marquee=r.data||[]; renderMarqTable(); renderDashStats(); })
+    .subscribe();
+}
+
+/* ════════════════════════════════════════
+   DELETE CONFIRM
+   ════════════════════════════════════════ */
+let _pendingDel=null;
+function delConfirm(table,id,msg){ _pendingDel={table,id}; document.getElementById('confirmMsg').textContent=msg||'Delete this item?'; openDlg('confirmDlg'); }
+document.getElementById('confirmOk').addEventListener('click',async()=>{
+  if(!_pendingDel) return;
+  const {error}=await supa.from(_pendingDel.table).delete().eq('id',_pendingDel.id);
+  if(error) toast('Error: '+error.message,'error');
+  else toast('🗑 Deleted');
+  _pendingDel=null; closeDlg('confirmDlg');
+});
+
+/* ════════════════════════════════════════
+   MOVE / REORDER
+   ════════════════════════════════════════ */
+async function moveRow(table, dataKey, id, dir){
+  const arr=[..._data[dataKey]];
+  const idx=arr.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  const ni=idx+dir;
+  if(ni<0||ni>=arr.length) return;
+  const a=arr[idx], b=arr[ni];
+  await Promise.all([
+    supa.from(table).update({sort_order:b.sort_order}).eq('id',a.id),
+    supa.from(table).update({sort_order:a.sort_order}).eq('id',b.id),
+  ]);
+  toast('↕ Reordered');
+}
+
+/* ════════════════════════════════════════
+   SETTINGS PANELS
+   ════════════════════════════════════════ */
+async function loadSettingsPanels(){
+  const {data}=await supa.from('settings').select('key,value');
+  const s={};
+  (data||[]).forEach(r=>s[r.key]=r.value);
+  document.getElementById('heroHeadline').value=s.hero_headline||'';
+  document.getElementById('heroSubheading').value=s.hero_subheading||'';
+  document.getElementById('heroCtaText').value=s.hero_cta_text||'';
+  document.getElementById('waPhone').value=s.whatsapp_number||'';
+  document.getElementById('waMessage').value=s.whatsapp_message||'';
+  document.getElementById('siteName').value=s.site_name||'';
+  updateWaPreview();
+}
+
+async function saveSetting(key,value){
+  const {error}=await supa.from('settings').upsert({key,value},{onConflict:'key'});
+  if(error) throw error;
+}
+
+document.getElementById('saveHeroBtn').addEventListener('click',async()=>{
+  try {
+    await Promise.all([
+      saveSetting('hero_headline',document.getElementById('heroHeadline').value.trim()),
+      saveSetting('hero_subheading',document.getElementById('heroSubheading').value.trim()),
+      saveSetting('hero_cta_text',document.getElementById('heroCtaText').value.trim()),
+    ]);
+    toast('✅ Hero section saved — live instantly');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+});
+
+document.getElementById('saveWaBtn').addEventListener('click',async()=>{
+  try {
+    await Promise.all([
+      saveSetting('whatsapp_number',document.getElementById('waPhone').value.trim()),
+      saveSetting('whatsapp_message',document.getElementById('waMessage').value.trim()),
+      saveSetting('site_name',document.getElementById('siteName').value.trim()),
+    ]);
+    toast('✅ Settings saved — live instantly');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+});
+
+function updateWaPreview(){
+  const p=document.getElementById('waPhone').value.trim()||'919999999999';
+  const m=document.getElementById('waMessage').value.trim()||'Hello';
+  document.getElementById('waLinkPreview').textContent=`https://wa.me/${p}?text=${encodeURIComponent(m)}`;
+}
+document.getElementById('waPhone').addEventListener('input',updateWaPreview);
+document.getElementById('waMessage').addEventListener('input',updateWaPreview);
+
+/* ════════════════════════════════════════
+   MARQUEE
+   ════════════════════════════════════════ */
+function renderMarqTable(){
+  const items=_data.marquee;
+  document.getElementById('marqCount').textContent=items.length;
+  const tbl=document.getElementById('marqTable');
+  if(!items.length){ tbl.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:24px">No items.</td></tr>'; return; }
+  tbl.innerHTML=`<thead><tr><th>Name</th><th>Text</th><th>Actions</th></tr></thead><tbody>`
+    +items.map(m=>`<tr>
+      <td style="font-weight:600">${m.name}</td>
+      <td style="color:var(--text2)">${m.text}</td>
+      <td><div class="act-btns">
+        <button class="btn btn-blue btn-xs" onclick="editMarq('${m.id}')">✏️</button>
+        <button class="btn btn-red btn-xs" onclick="delConfirm('marquee_items','${m.id}')">🗑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('marquee_items','marquee','${m.id}',-1)">↑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('marquee_items','marquee','${m.id}',1)">↓</button>
+      </div></td>
+    </tr>`).join('')+'</tbody>';
+}
+
+function openMarqDlg(){ document.getElementById('marqDlgId').value=''; document.getElementById('marqDlgName').value=''; document.getElementById('marqDlgText').value=''; document.getElementById('marqDlgTitle').textContent='New Ticker Item'; openDlg('marqDlg'); }
+window.openMarqDlg=openMarqDlg;
+
+window.editMarq=function(id){
+  const item=_data.marquee.find(x=>x.id===id); if(!item) return;
+  document.getElementById('marqDlgId').value=id;
+  document.getElementById('marqDlgName').value=item.name||'';
+  document.getElementById('marqDlgText').value=item.text||'';
+  document.getElementById('marqDlgTitle').textContent='Edit Ticker Item';
+  openDlg('marqDlg');
+};
+
+document.getElementById('marqDlgSave').addEventListener('click',async()=>{
+  const id=document.getElementById('marqDlgId').value;
+  const name=document.getElementById('marqDlgName').value.trim();
+  const text=document.getElementById('marqDlgText').value.trim();
+  if(!name||!text){ toast('Both fields required','error'); return; }
+  const maxOrder=_data.marquee.reduce((a,x)=>Math.max(a,x.sort_order||0),0);
+  const payload={name,text};
+  let err;
+  if(id){ ({error:err}=await supa.from('marquee_items').update(payload).eq('id',id)); }
+  else { ({error:err}=await supa.from('marquee_items').insert({...payload,sort_order:maxOrder+1})); }
+  if(err){ toast('Error: '+err.message,'error'); return; }
+  closeDlg('marqDlg'); toast('✅ Ticker item saved');
+});
+
+/* ════════════════════════════════════════
+   GALLERY
+   ════════════════════════════════════════ */
+function renderGalGrid(){
+  const items=_data.media.filter(m=>m.type==='image');
+  document.getElementById('galCount').textContent=_data.media.length;
+  const g=document.getElementById('galPreviewGrid');
+  if(!items.length){ g.innerHTML='<div style="color:var(--text3);font-size:.82rem">No images yet.</div>'; return; }
+  g.innerHTML=items.map(item=>`
+    <div class="preview-item">
+      <img src="${item.file_url}" alt="${item.caption||''}" loading="lazy"/>
+      <div class="preview-item-meta"><div class="preview-item-name">${item.caption||'No caption'}</div></div>
+      <button class="preview-del" onclick="delConfirm('media','${item.id}','Delete this image?')">✕</button>
+      <button class="preview-edit" onclick="openGalEdit('${item.id}','${(item.caption||'').replace(/'/g,"\\'")}','${item.file_url}')">✏️</button>
+    </div>`).join('');
+}
+
+document.getElementById('galFileInput').addEventListener('change',async function(){
+  const files=Array.from(this.files); if(!files.length) return;
+  const status=document.getElementById('galUploadStatus');
+  const maxOrd=_data.media.reduce((a,x)=>Math.max(a,x.sort_order||0),0);
+  let done=0;
+  for(const file of files){
+    try {
+      status.textContent=`Uploading ${done+1}/${files.length}…`;
+      const url=await uploadToStorage(file,BUCKETS.images,document.getElementById('galProgBar'),document.getElementById('galProg'));
+      await supa.from('media').insert({file_url:url,type:'image',caption:'',sort_order:maxOrd+done+1});
+      done++;
+    } catch(e){ toast('Upload failed: '+e.message,'error'); }
+  }
+  status.textContent=`✅ ${done} image(s) uploaded`;
+  this.value='';
+  toast(`✅ ${done} image(s) uploaded to gallery`);
+});
+
+window.openGalEdit=function(id,caption,url){
+  document.getElementById('galEditId').value=id;
+  document.getElementById('galEditCaption').value=caption;
+  document.getElementById('galEditPreview').src=url;
+  document.getElementById('galEditPreviewWrap').style.display='block';
+  openDlg('galEditDlg');
+};
+document.getElementById('galEditSaveBtn').addEventListener('click',async()=>{
+  const id=document.getElementById('galEditId').value;
+  const caption=document.getElementById('galEditCaption').value.trim();
+  const {error}=await supa.from('media').update({caption}).eq('id',id);
+  if(error){ toast('Error: '+error.message,'error'); return; }
+  closeDlg('galEditDlg'); toast('✅ Caption updated');
+});
+
+/* ════════════════════════════════════════
+   SHARED VIDEO/CAROUSEL TABLE RENDERER
+   ════════════════════════════════════════ */
+function renderVidTable(dataKey,tbodyId,countId){
+  const items=dataKey==='videos'?_data.videos:_data.carousel;
+  const table=dataKey==='videos'?'videos':'carousel_videos';
+  document.getElementById(countId).textContent=items.length;
+  const tbl=document.getElementById(tbodyId);
+  if(!items.length){ tbl.innerHTML=`<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px">No items yet.</td></tr>`; return; }
+  tbl.innerHTML=`<thead><tr><th>Thumb</th><th>Name</th><th>Earning</th><th>Actions</th></tr></thead><tbody>`
+    +items.map(v=>`<tr>
+      <td><img class="dtable-thumb" src="${v.image_url||'https://picsum.photos/seed/'+v.id+'/80/60'}" alt=""/></td>
+      <td style="font-weight:600">${v.name}<div style="font-size:.72rem;color:var(--text3)">${v.location||''}</div></td>
+      <td><span class="tag tag-orange">${v.earning||''}</span></td>
+      <td><div class="act-btns">
+        <button class="btn btn-blue btn-xs" onclick="${dataKey==='videos'?`openVideoDlg('${v.id}')`:`openCarDlg('${v.id}')`}">✏️</button>
+        <button class="btn btn-red btn-xs" onclick="delConfirm('${table}','${v.id}')">🗑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('${table}','${dataKey}','${v.id}',-1)">↑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('${table}','${dataKey}','${v.id}',1)">↓</button>
+      </div></td>
+    </tr>`).join('')+'</tbody>';
+}
+
+/* ════════════════════════════════════════
+   VIDEOS CRUD
+   ════════════════════════════════════════ */
+window.openVideoDlg=function(id){
+  const v=id?_data.videos.find(x=>x.id===id):null;
+  document.getElementById('vidDlgTitle').textContent=v?'Edit Video':'Add Video';
+  document.getElementById('vidDlgId').value=id||'';
+  document.getElementById('vidDlgName').value=v?.name||'';
+  document.getElementById('vidDlgLoc').value=v?.location||'';
+  document.getElementById('vidDlgEarn').value=v?.earning||'';
+  document.getElementById('vidDlgDur').value=v?.duration||'';
+  document.getElementById('vidDlgImgUrl').value=v?.image_url||'';
+  document.getElementById('vidDlgVidUrl').value=v?.video_url||'';
+  if(v?.image_url){ document.getElementById('vidDlgImgPrevImg').src=v.image_url; document.getElementById('vidDlgImgPrev').style.display='block'; }
+  else document.getElementById('vidDlgImgPrev').style.display='none';
+  openDlg('vidDlg');
+};
+document.getElementById('vidDlgImgFile').addEventListener('change',function(){ if(this.files[0]){ const r=new FileReader(); r.onload=e=>{ document.getElementById('vidDlgImgPrevImg').src=e.target.result; document.getElementById('vidDlgImgPrev').style.display='block'; }; r.readAsDataURL(this.files[0]); } });
+document.getElementById('vidDlgSave').addEventListener('click',async()=>{
+  const id=document.getElementById('vidDlgId').value;
+  const name=document.getElementById('vidDlgName').value.trim();
+  if(!name){ toast('Name required','error'); return; }
+  const btn=document.getElementById('vidDlgSave'); btn.disabled=true; btn.textContent='Saving…';
+  try {
+    let imageUrl=document.getElementById('vidDlgImgUrl').value.trim();
+    let videoUrl=document.getElementById('vidDlgVidUrl').value.trim();
+    const imgFile=document.getElementById('vidDlgImgFile').files[0];
+    const vidFile=document.getElementById('vidDlgVidFile').files[0];
+    if(imgFile) imageUrl=await uploadToStorage(imgFile,BUCKETS.images,document.getElementById('vidProgBar'),document.getElementById('vidProg'));
+    if(vidFile) videoUrl=await uploadToStorage(vidFile,BUCKETS.videos,document.getElementById('vidProgBar'),document.getElementById('vidProg'));
+    const payload={name,location:document.getElementById('vidDlgLoc').value.trim(),earning:document.getElementById('vidDlgEarn').value.trim(),duration:document.getElementById('vidDlgDur').value.trim(),image_url:imageUrl,video_url:videoUrl};
+    const maxOrd=_data.videos.reduce((a,x)=>Math.max(a,x.sort_order||0),0);
+    let err;
+    if(id){ ({error:err}=await supa.from('videos').update(payload).eq('id',id)); }
+    else { ({error:err}=await supa.from('videos').insert({...payload,sort_order:maxOrd+1})); }
+    if(err) throw err;
+    closeDlg('vidDlg'); toast('✅ Video saved — live on public page');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='Save'; }
+});
+
+/* ════════════════════════════════════════
+   CAROUSEL CRUD
+   ════════════════════════════════════════ */
+window.openCarDlg=function(id){
+  const v=id?_data.carousel.find(x=>x.id===id):null;
+  document.getElementById('carDlgTitle').textContent=v?'Edit Carousel Item':'Add Carousel Item';
+  document.getElementById('carDlgId').value=id||'';
+  document.getElementById('carDlgName').value=v?.name||'';
+  document.getElementById('carDlgLoc').value=v?.location||'';
+  document.getElementById('carDlgEarn').value=v?.earning||'';
+  document.getElementById('carDlgDur').value=v?.duration||'';
+  document.getElementById('carDlgImgUrl').value=v?.image_url||'';
+  document.getElementById('carDlgVidUrl').value=v?.video_url||'';
+  if(v?.image_url){ document.getElementById('carDlgImgPrevImg').src=v.image_url; document.getElementById('carDlgImgPrev').style.display='block'; }
+  else document.getElementById('carDlgImgPrev').style.display='none';
+  openDlg('carDlg');
+};
+document.getElementById('carDlgImgFile').addEventListener('change',function(){ if(this.files[0]){ const r=new FileReader(); r.onload=e=>{ document.getElementById('carDlgImgPrevImg').src=e.target.result; document.getElementById('carDlgImgPrev').style.display='block'; }; r.readAsDataURL(this.files[0]); } });
+document.getElementById('carDlgSave').addEventListener('click',async()=>{
+  const id=document.getElementById('carDlgId').value;
+  const name=document.getElementById('carDlgName').value.trim();
+  if(!name){ toast('Name required','error'); return; }
+  const btn=document.getElementById('carDlgSave'); btn.disabled=true; btn.textContent='Saving…';
+  try {
+    let imageUrl=document.getElementById('carDlgImgUrl').value.trim();
+    let videoUrl=document.getElementById('carDlgVidUrl').value.trim();
+    const imgFile=document.getElementById('carDlgImgFile').files[0];
+    const vidFile=document.getElementById('carDlgVidFile').files[0];
+    if(imgFile) imageUrl=await uploadToStorage(imgFile,BUCKETS.images,document.getElementById('carProgBar'),document.getElementById('carProg'));
+    if(vidFile) videoUrl=await uploadToStorage(vidFile,BUCKETS.videos,document.getElementById('carProgBar'),document.getElementById('carProg'));
+    const payload={name,location:document.getElementById('carDlgLoc').value.trim(),earning:document.getElementById('carDlgEarn').value.trim(),duration:document.getElementById('carDlgDur').value.trim(),image_url:imageUrl,video_url:videoUrl};
+    const maxOrd=_data.carousel.reduce((a,x)=>Math.max(a,x.sort_order||0),0);
+    let err;
+    if(id){ ({error:err}=await supa.from('carousel_videos').update(payload).eq('id',id)); }
+    else { ({error:err}=await supa.from('carousel_videos').insert({...payload,sort_order:maxOrd+1})); }
+    if(err) throw err;
+    closeDlg('carDlg'); toast('✅ Carousel item saved');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='Save'; }
+});
+
+/* ════════════════════════════════════════
+   TESTIMONIALS CRUD
+   ════════════════════════════════════════ */
+function renderTestTable(){
+  const items=_testFilter==='all'?_data.testimonials:_data.testimonials.filter(t=>t.category===_testFilter);
+  document.getElementById('testCount').textContent=_data.testimonials.length;
+  const tbl=document.getElementById('testTable');
+  if(!items.length){ tbl.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:24px">No testimonials.</td></tr>'; return; }
+  tbl.innerHTML=`<thead><tr><th>Avatar</th><th>Name</th><th>Category</th><th>Amount</th><th>Actions</th></tr></thead><tbody>`
+    +items.map(t=>`<tr>
+      <td><img class="dtable-av" src="${t.image_url||'https://picsum.photos/seed/'+t.id+'/80/80'}" alt=""/></td>
+      <td style="font-weight:600">${t.name}<div style="font-size:.72rem;color:var(--text3)">${t.location||''}</div></td>
+      <td><span class="tag tag-${t.category==='housewives'?'orange':t.category==='students'?'blue':'green'}">${t.category}</span></td>
+      <td style="color:var(--orange);font-weight:600">${t.amount||''}</td>
+      <td><div class="act-btns">
+        <button class="btn btn-blue btn-xs" onclick="openTestDlg('${t.id}')">✏️</button>
+        <button class="btn btn-red btn-xs" onclick="delConfirm('testimonials','${t.id}')">🗑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('testimonials','testimonials','${t.id}',-1)">↑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('testimonials','testimonials','${t.id}',1)">↓</button>
+      </div></td>
+    </tr>`).join('')+'</tbody>';
+}
+window.filterTest=function(cat,btn){ _testFilter=cat; document.querySelectorAll('#testCatFilter .btn').forEach(b=>b.classList.remove('act')); btn.classList.add('act'); renderTestTable(); };
+
+window.openTestDlg=function(id){
+  const t=id?_data.testimonials.find(x=>x.id===id):null;
+  document.getElementById('testDlgTitle').textContent=t?'Edit Testimonial':'Add Testimonial';
+  document.getElementById('testDlgId').value=id||'';
+  document.getElementById('testDlgName').value=t?.name||'';
+  document.getElementById('testDlgLoc').value=t?.location||'';
+  document.getElementById('testDlgCat').value=t?.category||'housewives';
+  document.getElementById('testDlgAmount').value=t?.amount||'';
+  document.getElementById('testDlgQuote').value=t?.quote||'';
+  document.getElementById('testDlgImgUrl').value=t?.image_url||'';
+  if(t?.image_url){ document.getElementById('testDlgImgPrevImg').src=t.image_url; document.getElementById('testDlgImgPrev').style.display='block'; }
+  else document.getElementById('testDlgImgPrev').style.display='none';
+  openDlg('testDlg');
+};
+document.getElementById('testDlgImgFile').addEventListener('change',function(){ if(this.files[0]){ const r=new FileReader(); r.onload=e=>{ document.getElementById('testDlgImgPrevImg').src=e.target.result; document.getElementById('testDlgImgPrev').style.display='block'; }; r.readAsDataURL(this.files[0]); } });
+document.getElementById('testDlgImgUrl').addEventListener('input',function(){ if(this.value){ document.getElementById('testDlgImgPrevImg').src=this.value; document.getElementById('testDlgImgPrev').style.display='block'; } });
+document.getElementById('testDlgSave').addEventListener('click',async()=>{
+  const id=document.getElementById('testDlgId').value;
+  const name=document.getElementById('testDlgName').value.trim();
+  const quote=document.getElementById('testDlgQuote').value.trim();
+  if(!name||!quote){ toast('Name and quote required','error'); return; }
+  const btn=document.getElementById('testDlgSave'); btn.disabled=true; btn.textContent='Saving…';
+  try {
+    let image_url=document.getElementById('testDlgImgUrl').value.trim();
+    const imgFile=document.getElementById('testDlgImgFile').files[0];
+    if(imgFile) image_url=await uploadToStorage(imgFile,BUCKETS.images,document.getElementById('testProgBar'),document.getElementById('testProg'));
+    const payload={name,location:document.getElementById('testDlgLoc').value.trim(),category:document.getElementById('testDlgCat').value,amount:document.getElementById('testDlgAmount').value.trim(),quote,image_url};
+    const maxOrd=_data.testimonials.reduce((a,x)=>Math.max(a,x.sort_order||0),0);
+    let err;
+    if(id){ ({error:err}=await supa.from('testimonials').update(payload).eq('id',id)); }
+    else { ({error:err}=await supa.from('testimonials').insert({...payload,sort_order:maxOrd+1})); }
+    if(err) throw err;
+    closeDlg('testDlg'); toast('✅ Testimonial saved — live on public page');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+  finally { btn.disabled=false; btn.textContent='Save'; }
+});
+
+/* ════════════════════════════════════════
+   CHAT CRUD
+   ════════════════════════════════════════ */
+function renderChatPanel(){
+  const items=_data.chat;
+  document.getElementById('chatCount').textContent=items.length;
+  const tbl=document.getElementById('chatTable');
+  if(!items.length){ tbl.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px">No messages yet.</td></tr>'; }
+  else tbl.innerHTML=`<thead><tr><th>Dir</th><th>Sender</th><th>Message</th><th>Actions</th></tr></thead><tbody>`
+    +items.map(m=>`<tr>
+      <td>${m.direction==='incoming'?'<span class="tag tag-blue">←In</span>':'<span class="tag tag-green">Out→</span>'}</td>
+      <td style="font-size:.8rem">${m.sender||'—'}</td>
+      <td style="font-size:.8rem;max-width:180px">${(m.message||'').substring(0,40)}${m.earn_badge?` <span class="tag tag-orange" style="font-size:.65rem">${m.earn_badge}</span>`:''}</td>
+      <td><div class="act-btns">
+        <button class="btn btn-blue btn-xs" onclick="openChatDlg('${m.id}')">✏️</button>
+        <button class="btn btn-red btn-xs" onclick="delConfirm('chat_messages','${m.id}')">🗑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('chat_messages','chat','${m.id}',-1)">↑</button>
+        <button class="btn btn-ghost btn-xs" onclick="moveRow('chat_messages','chat','${m.id}',1)">↓</button>
+      </div></td>
+    </tr>`).join('')+'</tbody>';
+  // Preview
+  const prev=document.getElementById('chatPreview');
+  prev.innerHTML=items.map(m=>`
+    <div class="cprev ${m.direction}">
+      ${m.direction==='incoming'&&m.sender?`<div class="cprev-sender">${m.sender}</div>`:''}
+      <div class="cprev-bubble">${m.message}</div>
+      ${m.earn_badge?`<div class="cprev-earn">💸 ${m.earn_badge}</div>`:''}
+    </div>`).join('');
+  setTimeout(()=>prev.scrollTop=prev.scrollHeight,80);
+}
+
+window.openChatDlg=function(id){
+  const m=id?_data.chat.find(x=>x.id===id):null;
+  document.getElementById('chatDlgTitle').textContent=m?'Edit Message':'Add Message';
+  document.getElementById('chatDlgId').value=id||'';
+  document.getElementById('chatDlgDir').value=m?.direction||'incoming';
+  document.getElementById('chatDlgSender').value=m?.sender||'';
+  document.getElementById('chatDlgMsg').value=m?.message||'';
+  document.getElementById('chatDlgEarn').value=m?.earn_badge||'';
+  document.getElementById('chatDlgTime').value=m?.time_label||'';
+  openDlg('chatDlg');
+};
+document.getElementById('chatDlgSave').addEventListener('click',async()=>{
+  const id=document.getElementById('chatDlgId').value;
+  const message=document.getElementById('chatDlgMsg').value.trim();
+  if(!message){ toast('Message text required','error'); return; }
+  const payload={message,sender:document.getElementById('chatDlgSender').value.trim(),direction:document.getElementById('chatDlgDir').value,earn_badge:document.getElementById('chatDlgEarn').value.trim(),time_label:document.getElementById('chatDlgTime').value.trim()||new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})};
+  const maxOrd=_data.chat.reduce((a,x)=>Math.max(a,x.sort_order||0),0);
+  let err;
+  if(id){ ({error:err}=await supa.from('chat_messages').update(payload).eq('id',id)); }
+  else { ({error:err}=await supa.from('chat_messages').insert({...payload,sort_order:maxOrd+1})); }
+  if(err){ toast('Error: '+err.message,'error'); return; }
+  closeDlg('chatDlg'); toast('✅ Message saved');
+});
+
+// Expose globals
+window.delConfirm=delConfirm;
+window.moveRow=moveRow;
+</script>
+</body>
+</html>
