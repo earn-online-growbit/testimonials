@@ -4,8 +4,8 @@
 //  Find them: Supabase Dashboard → Project Settings → API
 // ══════════════════════════════════════════════════════════════
 
-const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const SUPABASE_URL      = 'sb_publishable_RmexM-TP58LGNGJtKANjcQ_L_nOWZFg';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmaXNyd2ZtcWZsZmF3bnZvdXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTcwNTMsImV4cCI6MjA4OTgzMzA1M30.jsFISnYWejRJPx-ab3bCh1qOLL2oyttpwc4PkNdu3tE';
 
 // Supabase client — imported via CDN in HTML files
 // window.supabase is available after the CDN script loads
