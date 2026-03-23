@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — EarnOnline CMS</title>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root{
+  --bg:#0F1117; --bg2:#161B26; --bg3:#1E2535; --bg4:#252D3E;
+  --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.12);
+  --orange:#E8621A; --orange-dk:#C4501A; --orange-sf:rgba(232,98,26,.12);
+  --green:#25D366; --red:#EF4444; --red-sf:rgba(239,68,68,.12);
+  --blue:#3B82F6; --blue-sf:rgba(59,130,246,.12);
+  --text:#F0F4FF; --text2:#A0AABF; --text3:#5C6880;
+  --white:#FFFFFF;
+  --ff-h:'Syne',sans-serif; --ff-b:'DM Sans',sans-serif;
+  --r:10px; --r-lg:16px;
+  --sh:0 4px 24px rgba(0,0,0,.4);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--ff-b)}
+body{background:var(--bg);color:var(--text);overflow:hidden}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;outline:none;font-family:var(--ff-b)}
+input,textarea,select{font-family:var(--ff-b)}
+
+/* ─── SCROLLBAR ─────────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+
+/* ─── LOGIN PAGE ─────────────────────────────────────────── */
+#loginPage{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+#loginPage.hidden{display:none}
+.login-card{
+  width:100%;max-width:420px;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:var(--r-lg);
+  padding:44px 40px;
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+}
+.login-logo{
+  font-family:var(--ff-h);font-size:1.6rem;font-weight:800;
+  color:var(--text);margin-bottom:4px;
+  display:flex;align-items:center;gap:10px;
+}
+.login-logo span{color:var(--orange)}
+.login-sub{font-size:.82rem;color:var(--text3);margin-bottom:36px}
+.login-label{display:block;font-size:.75rem;font-weight:600;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.login-input{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border);
+  border-radius:var(--r);color:var(--text);font-size:.9rem;
+  padding:12px 15px;transition:border-color .2s;margin-bottom:18px;
+}
+.login-input:focus{outline:none;border-color:var(--orange)}
+.login-input::placeholder{color:var(--text3)}
+.login-btn{
+  width:100%;background:var(--orange);color:#fff;
+  padding:14px;border-radius:var(--r);font-size:.95rem;font-weight:700;
+  font-family:var(--ff-h);letter-spacing:.02em;
+  transition:background .2s,transform .15s;margin-top:8px;
+}
+.login-btn:hover{background:var(--orange-dk);transform:translateY(-1px)}
+.login-err{
+  background:var(--red-sf);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;
+  font-size:.8rem;padding:10px 14px;border-radius:8px;margin-bottom:16px;
+  display:none;
+}
+.login-err.show{display:block}
+.login-hint{font-size:.72rem;color:var(--text3);text-align:center;margin-top:20px;line-height:1.6}
+
+/* ─── APP SHELL ─────────────────────────────────────────── */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:row}
+#app.active{display:flex}
+
+/* ─── SIDEBAR ────────────────────────────────────────────── */
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.sb-logo{
+  padding:22px 20px 18px;
+  font-family:var(--ff-h);font-size:1.15rem;font-weight:800;
+  color:var(--text);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.sb-logo span{color:var(--orange)}
+.sb-logo .badge{background:var(--orange-sf);color:var(--orange);font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:100px;margin-left:auto;font-family:var(--ff-b);letter-spacing:.06em}
+.sb-section{padding:16px 12px 6px;font-size:.65rem;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.sb-link{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:var(--r);
+  font-size:.85rem;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:all .18s;margin:1px 6px;
+}
+.sb-link:hover{background:var(--bg3);color:var(--text)}
+.sb-link.act{background:var(--orange-sf);color:var(--orange);font-weight:600}
+.sb-link .ico{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.sb-link .badge{background:var(--bg4);color:var(--text2);font-size:.65rem;padding:2px 7px;border-radius:100px;margin-left:auto}
+.sb-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.sb-logout{
+  display:flex;align-items:center;gap:8px;
+  background:var(--red-sf);color:#FCA5A5;
+  padding:10px 14px;border-radius:var(--r);font-size:.83rem;font-weight:600;
+  border:1px solid rgba(239,68,68,.18);transition:all .2s;width:100%;
+}
+.sb-logout:hover{background:rgba(239,68,68,.2)}
+
+/* ─── MAIN AREA ─────────────────────────────────────────── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:16px 28px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;position:sticky;top:0;z-index:100;
+}
+.topbar-title{font-family:var(--ff-h);font-size:1.15rem;font-weight:700;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.25);color:#4ade80;font-size:.73rem;font-weight:600;padding:6px 12px;border-radius:100px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.topbar-user{font-size:.8rem;color:var(--text2)}
+
+.content{padding:28px;flex:1}
+
+/* ─── PANELS ─────────────────────────────────────────────── */
+.panel{display:none}
+.panel.act{display:block}
+
+/* ─── STAT CARDS ─────────────────────────────────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
+.stat-card-icon{font-size:1.6rem;margin-bottom:10px}
+.stat-card-num{font-family:var(--ff-h);font-size:1.8rem;font-weight:800;color:var(--text)}
+.stat-card-lbl{font-size:.75rem;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.stat-card-delta{font-size:.72rem;color:#4ade80;margin-top:6px;font-weight:600}
+
+/* ─── SECTION HEADER ─────────────────────────────────────── */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.sec-hd-title{font-family:var(--ff-h);font-size:1rem;font-weight:700;color:var(--text)}
+.sec-hd-sub{font-size:.78rem;color:var(--text3);margin-top:2px}
+
+/* ─── BUTTONS ────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:.82rem;font-weight:600;transition:all .2s;cursor:pointer}
+.btn-orange{background:var(--orange);color:#fff}
+.btn-orange:hover{background:var(--orange-dk)}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg4);color:var(--text)}
+.btn-red{background:var(--red-sf);color:#FCA5A5;border:1px solid rgba(239,68,68,.18)}
+.btn-red:hover{background:rgba(239,68,68,.2)}
+.btn-blue{background:var(--blue-sf);color:#93C5FD;border:1px solid rgba(59,130,246,.2)}
+.btn-blue:hover{background:rgba(59,130,246,.2)}
+.btn-sm{padding:6px 12px;font-size:.75rem}
+.btn-xs{padding:4px 9px;font-size:.7rem}
+
+/* ─── FORM ELEMENTS ─────────────────────────────────────── */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.73rem;font-weight:600;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
+.input,.textarea,.select{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border);
+  border-radius:var(--r);color:var(--text);font-size:.87rem;
+  padding:10px 13px;transition:border-color .2s;
+}
+.input:focus,.textarea:focus,.select:focus{outline:none;border-color:var(--orange)}
+.input::placeholder,.textarea::placeholder{color:var(--text3)}
+.textarea{resize:vertical;min-height:80px;line-height:1.5}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C6880' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.hint{font-size:.72rem;color:var(--text3);margin-top:6px}
+
+/* ─── CARD ───────────────────────────────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-head-title{font-family:var(--ff-h);font-size:.88rem;font-weight:700;color:var(--text);flex:1}
+.card-body{padding:20px}
+
+/* ─── UPLOAD ZONE ────────────────────────────────────────── */
+.upload-zone{
+  border:2px dashed rgba(232,98,26,.35);border-radius:var(--r-lg);
+  padding:36px 20px;text-align:center;cursor:pointer;
+  background:var(--orange-sf);transition:all .2s;margin-bottom:16px;
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--orange);background:rgba(232,98,26,.15)}
+.upload-zone-icon{font-size:2.2rem;margin-bottom:10px}
+.upload-zone-text{font-size:.83rem;color:var(--text2);line-height:1.7}
+.upload-zone-text strong{color:var(--orange)}
+.upload-zone-sub{font-size:.7rem;color:var(--text3);margin-top:6px}
+.prog-wrap{height:5px;background:var(--bg3);border-radius:100px;margin-top:10px;overflow:hidden;display:none}
+.prog-bar{height:100%;width:0;background:var(--orange);border-radius:100px;transition:width .3s}
+
+/* ─── PREVIEW GRID ───────────────────────────────────────── */
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:16px}
+.preview-item{position:relative;border-radius:var(--r);overflow:hidden;background:var(--bg3);border:1px solid var(--border)}
+.preview-item img{width:100%;aspect-ratio:1;object-fit:cover}
+.preview-item-meta{padding:8px 10px}
+.preview-item-name{font-size:.72rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preview-item-cat{font-size:.68rem;color:var(--text3);margin-top:2px}
+.preview-del{
+  position:absolute;top:6px;right:6px;
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(15,17,23,.8);color:#FCA5A5;
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;
+  cursor:pointer;transition:background .2s;border:1px solid rgba(239,68,68,.3);
+}
+.preview-del:hover{background:var(--red)}
+
+/* ─── DATA TABLE ─────────────────────────────────────────── */
+.dtable{width:100%;border-collapse:collapse}
+.dtable th{text-align:left;font-size:.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg)}
+.dtable td{padding:12px 14px;font-size:.82rem;color:var(--text2);border-bottom:1px solid var(--border);vertical-align:middle}
+.dtable tr:last-child td{border-bottom:none}
+.dtable tr:hover td{background:var(--bg3)}
+.dtable-av{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3)}
+.dtable-thumb{width:52px;height:40px;border-radius:6px;object-fit:cover;background:var(--bg3)}
+.tag{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.68rem;font-weight:600}
+.tag-orange{background:var(--orange-sf);color:var(--orange)}
+.tag-blue{background:var(--blue-sf);color:#93C5FD}
+.tag-green{background:rgba(37,211,102,.12);color:#4ade80}
+.tag-red{background:var(--red-sf);color:#FCA5A5}
+.tag-gray{background:var(--bg4);color:var(--text3)}
+.act-btns{display:flex;gap:6px}
+
+/* ─── MODAL DIALOG ───────────────────────────────────────── */
+.dlg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.dlg-overlay.open{display:flex}
+.dlg{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);width:100%;max-width:520px;box-shadow:0 32px 80px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto}
+.dlg-head{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.dlg-head-title{font-family:var(--ff-h);font-size:.95rem;font-weight:700;color:var(--text)}
+.dlg-x{width:30px;height:30px;border-radius:50%;background:var(--bg3);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
+.dlg-x:hover{background:var(--bg4)}
+.dlg-body{padding:22px}
+.dlg-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--bg2)}
+
+/* ─── TOAST ──────────────────────────────────────────────── */
+.toast-stack{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:12px 18px;border-radius:var(--r);font-size:.83rem;font-weight:500;display:flex;align-items:center;gap:10px;transform:translateX(120%);transition:transform .3s;pointer-events:all;min-width:240px;max-width:320px}
+.toast.show{transform:none}
+.toast.success{border-color:rgba(74,222,128,.3)}
+.toast.error{border-color:rgba(239,68,68,.3)}
+
+/* ─── CHAT PREVIEW ───────────────────────────────────────── */
+.chat-preview{background:#ECE5DD;border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto}
+.cprev{max-width:80%;display:flex;flex-direction:column;gap:3px}
+.cprev.in{align-self:flex-start}
+.cprev.out{align-self:flex-end}
+.cprev-bubble{padding:8px 12px;border-radius:10px;font-size:.82rem;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.cprev.in .cprev-bubble{background:#fff;color:#2C1810;border-radius:0 10px 10px 10px}
+.cprev.out .cprev-bubble{background:#DCF8C6;color:#2C1810;border-radius:10px 10px 0 10px}
+.cprev-earn{background:#E8621A;color:#fff;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:100px;display:inline-flex;align-items:center;gap:4px;margin-top:3px;align-self:flex-start}
+.cprev-sender{font-size:.68rem;font-weight:600;color:#E8621A;padding-left:3px;margin-bottom:1px}
+
+/* ─── SORTABLE HINT ─────────────────────────────────────────*/
+.sort-hint{font-size:.72rem;color:var(--text3);display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:12px}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:900px){
+  .sidebar{width:200px}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+}
+@media(max-width:680px){
+  body{overflow:auto}
+  #app.active{flex-direction:column;height:auto}
+  .sidebar{width:100%;height:auto;flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .sb-logo,.sb-section,.sb-footer{display:none}
+  .sb-link{flex-direction:column;gap:3px;font-size:.62rem;padding:10px 8px;min-width:64px}
+  .sb-link .ico{font-size:1.1rem}
+  .sb-link .badge{display:none}
+  .main{overflow:visible}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     LOGIN PAGE
+     ═══════════════════════════════════════════════════════ -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">🔒 <span>Earn</span>Online Admin</div>
+    <p class="login-sub">Secure admin access only. Do not share credentials.</p>
+    <div class="login-err" id="loginErr">Incorrect username or password.</div>
+    <label class="login-label">Username</label>
+    <input type="text" class="login-input" id="loginUser" placeholder="admin" autocomplete="username"/>
+    <label class="login-label">Password</label>
+    <input type="password" class="login-input" id="loginPass" placeholder="••••••••" autocomplete="current-password"/>
+    <button class="login-btn" id="loginBtn">Sign In to Dashboard</button>
+    <p class="login-hint">Default credentials:<br/>Username: <strong>admin</strong> · Password: <strong>EarnPro@2024</strong><br/>Change password after first login.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     APP SHELL
+     ═══════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">🟠 <span>Earn</span>CMS <span class="badge">Admin</span></div>
+
+    <div class="sb-section">Overview</div>
+    <div class="sb-link act" data-panel="dashboard"><span class="ico">📊</span> Dashboard</div>
+
+    <div class="sb-section">Content</div>
+    <div class="sb-link" data-panel="hero"><span class="ico">🏠</span> Hero Section</div>
+    <div class="sb-link" data-panel="gallery"><span class="ico">🖼</span> Image Gallery</div>
+    <div class="sb-link" data-panel="videos"><span class="ico">🎥</span> Videos</div>
+    <div class="sb-link" data-panel="testimonials"><span class="ico">💬</span> Testimonials</div>
+    <div class="sb-link" data-panel="chat"><span class="ico">📱</span> Chat Messages</div>
+    <div class="sb-link" data-panel="marquee"><span class="ico">📢</span> Marquee Ticker</div>
+
+    <div class="sb-section">Config</div>
+    <div class="sb-link" data-panel="whatsapp"><span class="ico">💚</span> WhatsApp CTA</div>
+    <div class="sb-link" data-panel="settings"><span class="ico">⚙️</span> Site Settings</div>
+    <div class="sb-link" data-panel="security"><span class="ico">🔑</span> Change Password</div>
+
+    <div class="sb-footer">
+      <button class="sb-logout" id="logoutBtn">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="panelTitle">Dashboard</div>
+      <div class="topbar-right">
+        <div class="live-badge"><div class="live-dot"></div>Live Sync</div>
+        <div class="topbar-user" id="topbarUser">admin</div>
+        <a href="index.html" target="_blank" class="btn btn-ghost btn-sm">↗ View Site</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="panel act" id="panel-dashboard">
+        <div class="stats-row" id="statsRow"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="dash-grid">
+          <div class="card">
+            <div class="card-head"><div class="card-head-title">📋 Quick Actions</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn btn-orange" onclick="navTo('gallery')">➕ Add Gallery Image</button>
+              <button class="btn btn-ghost" onclick="navTo('videos')">🎥 Add Video Proof</button>
+              <button class="btn btn-ghost" onclick="navTo('testimonials')">💬 Add Testimonial</button>
+              <button class="btn btn-ghost" onclick="navTo('chat')">📱 Add Chat Message</button>
+              <button class="btn btn-ghost" onclick="navTo('whatsapp')">💚 Update WhatsApp Number</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-title">ℹ️ How It Works</div></div>
+            <div class="card-body" style="font-size:.82rem;color:var(--text2);line-height:1.8">
+              <p>• All changes save <strong style="color:var(--orange)">instantly</strong> to shared storage</p>
+              <p>• Public page reads live from this data</p>
+              <p>• No rebuild or redeploy needed</p>
+              <p>• Admin panel is completely separate from the public site</p>
+              <p>• Changes appear on public page in <strong style="color:var(--green)">real-time</strong></p>
+              <p style="margin-top:14px;padding:10px 12px;background:var(--bg3);border-radius:8px;color:var(--text3)">🔗 Public URL: <code style="color:var(--orange)">index.html</code></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── HERO ── -->
+      <div class="panel" id="panel-hero">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-title">Hero Section Editor</div>
+            <button class="btn btn-orange btn-sm" id="saveHeroBtn">💾 Save Hero</button>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label>Headline (HTML allowed for &lt;span&gt; color)</label>
+              <textarea class="textarea" id="heroHeadline" rows="3" placeholder="Real People.<br/>Real Income.<br/><span>Real Results.</span>"></textarea>
+              <div class="hint">Use &lt;span&gt;text&lt;/span&gt; to color words orange. Use &lt;br/&gt; for line breaks.</div>
+            </div>
+            <div class="field">
+              <label>Subheading</label>
+              <textarea class="textarea" id="heroSubheading" rows="2"></textarea>
+            </div>
+            <div class="field">
+              <label>Primary CTA Button Text</label>
+              <input type="text" class="input" id="heroCtaText" placeholder="See Real Proof"/>
+            </div>
+            <div style="background:var(--bg3);border-radius:var(--r);padding:14px;margin-top:8px">
+              <p style="font-size:.75rem;color:var(--text3)">💡 Changes to the hero section will update the headline, subheading, and CTA button on the public landing page.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── GALLERY ── -->
+      <div class="panel" id="panel-gallery">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Image Gallery & Payment Proofs</div><div class="sec-hd-sub">Upload payment screenshots, proof images. Appear in the public gallery grid.</div></div>
+          <button class="btn btn-orange" id="openGalDlgBtn">➕ Add Image</button>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-head"><div class="card-head-title">Upload Images</div></div>
+          <div class="card-body">
+            <div class="upload-zone" id="galUploadZone">
+              <div class="upload-zone-icon">📸</div>
+              <div class="upload-zone-text"><strong>Drag & drop images</strong> here, or click to browse</div>
+              <div class="upload-zone-sub">JPG, PNG, WEBP · Multiple files supported · Max 8MB each</div>
+              <input type="file" id="galFileInput" accept="image/*" multiple style="display:none"/>
+            </div>
+            <div class="prog-wrap" id="galProg"><div class="prog-bar" id="galProgBar"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Gallery Items (<span id="galCount">0</span>)</div></div>
+          <div class="card-body">
+            <div style="overflow-x:auto">
+              <table class="dtable" id="galTable"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── VIDEOS ── -->
+      <div class="panel" id="panel-videos">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Video Testimonials</div><div class="sec-hd-sub">Manage testimonial videos shown in the video grid and carousel.</div></div>
+          <button class="btn btn-orange" id="openVidDlgBtn">➕ Add Video</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">All Videos (<span id="vidCount">0</span>)</div><div class="hint" style="margin:0">Grid videos + Carousel videos</div></div>
+          <div class="card-body"><div style="overflow-x:auto"><table class="dtable" id="vidTable"></table></div></div>
+        </div>
+      </div>
+
+      <!-- ── TESTIMONIALS ── -->
+      <div class="panel" id="panel-testimonials">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Category Testimonials</div><div class="sec-hd-sub">Add testimonials for Housewives, Students, and Professionals tabs.</div></div>
+          <button class="btn btn-orange" id="openTestDlgBtn">➕ Add Testimonial</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" id="testTabBar">
+          <button class="btn btn-orange btn-sm act-test" data-tc="housewives">🏠 Housewives</button>
+          <button class="btn btn-ghost btn-sm act-test" data-tc="students">🎓 Students</button>
+          <button class="btn btn-ghost btn-sm act-test" data-tc="professionals">💼 Professionals</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title" id="testPanelTitle">Housewives Testimonials</div></div>
+          <div class="card-body"><div style="overflow-x:auto"><table class="dtable" id="testTable"></table></div></div>
+        </div>
+      </div>
+
+      <!-- ── CHAT ── -->
+      <div class="panel" id="panel-chat">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Chat-Style Testimonials</div><div class="sec-hd-sub">WhatsApp-style messages shown on the public page.</div></div>
+          <button class="btn btn-orange" id="openChatDlgBtn">➕ Add Message</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+          <div class="card">
+            <div class="card-head"><div class="card-head-title">Messages (<span id="chatCount">0</span>)</div></div>
+            <div class="card-body"><div style="overflow-x:auto"><table class="dtable" id="chatTable"></table></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-head-title">Live Preview</div></div>
+            <div class="card-body"><div class="chat-preview" id="chatPreview"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MARQUEE ── -->
+      <div class="panel" id="panel-marquee">
+        <div class="sec-hd">
+          <div><div class="sec-hd-title">Marquee Ticker Items</div><div class="sec-hd-sub">Scrolling trust bar shown below the hero section.</div></div>
+          <button class="btn btn-orange" id="openMarqDlgBtn">➕ Add Item</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title">Ticker Items (<span id="marqCount">0</span>)</div></div>
+          <div class="card-body"><div style="overflow-x:auto"><table class="dtable" id="marqTable"></table></div></div>
+        </div>
+      </div>
+
+      <!-- ── WHATSAPP ── -->
+      <div class="panel" id="panel-whatsapp">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-title">💚 WhatsApp CTA Settings</div>
+            <button class="btn btn-orange btn-sm" id="saveWaBtn">💾 Save & Apply</button>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label>WhatsApp Phone Number</label>
+              <input type="text" class="input" id="waPhone" placeholder="919999999999"/>
+              <div class="hint">Include country code without + or spaces. India: 91XXXXXXXXXX</div>
+            </div>
+            <div class="field">
+              <label>Pre-filled Message (sent when user clicks CTA)</label>
+              <textarea class="textarea" id="waMessage" rows="3"></textarea>
+            </div>
+            <div id="waPreview" style="margin-top:20px;background:var(--bg3);border-radius:var(--r);padding:16px">
+              <div style="font-size:.72rem;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Generated WhatsApp Link</div>
+              <code id="waLinkPreview" style="font-size:.78rem;color:var(--orange);word-break:break-all"></code>
+            </div>
+            <div style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);border-radius:var(--r);padding:14px;margin-top:16px">
+              <p style="font-size:.8rem;color:#4ade80;font-weight:600">✅ All CTA buttons across the public page — hero, nav, floating button, sticky mobile, and final CTA — all use this single number and message.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="panel" id="panel-settings">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-title">⚙️ Site Settings</div>
+            <button class="btn btn-orange btn-sm" id="saveSettingsBtn">💾 Save Settings</button>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label>Site Name</label>
+              <input type="text" class="input" id="siteName" placeholder="EarnOnline.in"/>
+              <div class="hint">Appears in the logo, footer, and browser tab.</div>
+            </div>
+            <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+              <div style="font-size:.78rem;color:var(--text2);font-weight:600;margin-bottom:12px">Danger Zone</div>
+              <button class="btn btn-red" id="resetDataBtn">🗑 Reset All Data to Defaults</button>
+              <div class="hint" style="margin-top:8px;color:var(--red)">This will erase all custom content and restore defaults. This cannot be undone.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECURITY ── -->
+      <div class="panel" id="panel-security">
+        <div class="card" style="max-width:480px">
+          <div class="card-head"><div class="card-head-title">🔑 Change Password</div></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Current Password</label>
+              <input type="password" class="input" id="curPass" placeholder="••••••••"/>
+            </div>
+            <div class="field">
+              <label>New Password</label>
+              <input type="password" class="input" id="newPass" placeholder="At least 8 characters"/>
+            </div>
+            <div class="field">
+              <label>Confirm New Password</label>
+              <input type="password" class="input" id="confPass" placeholder="Repeat new password"/>
+            </div>
+            <button class="btn btn-orange" id="changePassBtn">🔒 Update Password</button>
+            <div class="hint" style="margin-top:12px">Password is stored locally. Make sure to remember it or write it somewhere safe.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════════════════════════════════════════════
+     DIALOGS
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- Gallery Item Dialog -->
+<div class="dlg-overlay" id="galDlg">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div class="dlg-head-title" id="galDlgTitle">Add Gallery Image</div>
+      <div class="dlg-x" onclick="closeDlg('galDlg')">✕</div>
+    </div>
+    <div class="dlg-body">
+      <div class="field">
+        <label>Image (upload or use URL)</label>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-orange btn-sm" onclick="document.getElementById('galDlgFile').click()">📂 Upload</button>
+          <span style="color:var(--text3);font-size:.8rem;align-self:center">or paste URL below</span>
+        </div>
+        <input type="file" id="galDlgFile" accept="image/*" style="display:none"/>
+        <input type="text" class="input" id="galDlgUrl" placeholder="https://... or will be set after upload"/>
+        <div id="galDlgPreviewWrap" style="margin-top:10px;display:none">
+          <img id="galDlgPreview" src="" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Caption / Earning Amount</label>
+        <input type="text" class="input" id="galDlgLabel" placeholder="₹12,500 earned"/>
+      </div>
+      <input type="hidden" id="galDlgId"/>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" onclick="closeDlg('galDlg')">Cancel</button>
+      <button class="btn btn-orange" id="galDlgSave">Save Image</button>
+    </div>
+  </div>
+</div>
+
+<!-- Video Dialog -->
+<div class="dlg-overlay" id="vidDlg">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div class="dlg-head-title" id="vidDlgTitle">Add Video</div>
+      <div class="dlg-x" onclick="closeDlg('vidDlg')">✕</div>
+    </div>
+    <div class="dlg-body">
+      <div class="field">
+        <label>Thumbnail Image URL or Upload</label>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-orange btn-sm" onclick="document.getElementById('vidDlgFile').click()">📂 Upload Thumbnail</button>
+        </div>
+        <input type="file" id="vidDlgFile" accept="image/*" style="display:none"/>
+        <input type="text" class="input" id="vidDlgSrc" placeholder="https://... thumbnail image URL"/>
+        <div id="vidDlgPreviewWrap" style="margin-top:10px;display:none">
+          <img id="vidDlgPreview" src="" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Person Name</label><input type="text" class="input" id="vidDlgName" placeholder="Priya Sharma"/></div>
+        <div class="field"><label>Location</label><input type="text" class="input" id="vidDlgLoc" placeholder="Jaipur, Rajasthan"/></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Earning Amount</label><input type="text" class="input" id="vidDlgEarn" placeholder="₹18,500/mo"/></div>
+        <div class="field"><label>Duration (display only)</label><input type="text" class="input" id="vidDlgDur" placeholder="2:34"/></div>
+      </div>
+      <div class="field">
+        <label>Section</label>
+        <select class="select" id="vidDlgSection">
+          <option value="grid">Main Grid (Video Section)</option>
+          <option value="carousel">Carousel (More Results)</option>
+        </select>
+      </div>
+      <input type="hidden" id="vidDlgId"/>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" onclick="closeDlg('vidDlg')">Cancel</button>
+      <button class="btn btn-orange" id="vidDlgSave">Save Video</button>
+    </div>
+  </div>
+</div>
+
+<!-- Testimonial Dialog -->
+<div class="dlg-overlay" id="testDlg">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div class="dlg-head-title" id="testDlgTitle">Add Testimonial</div>
+      <div class="dlg-x" onclick="closeDlg('testDlg')">✕</div>
+    </div>
+    <div class="dlg-body">
+      <div class="field">
+        <label>Photo (upload or URL)</label>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-orange btn-sm" onclick="document.getElementById('testDlgFile').click()">📂 Upload Photo</button>
+        </div>
+        <input type="file" id="testDlgFile" accept="image/*" style="display:none"/>
+        <input type="text" class="input" id="testDlgSrc" placeholder="https://... photo URL (optional)"/>
+        <div id="testDlgPreviewWrap" style="margin-top:10px;display:none">
+          <img id="testDlgPreview" src="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Name</label><input type="text" class="input" id="testDlgName" placeholder="Priya S."/></div>
+        <div class="field"><label>Location</label><input type="text" class="input" id="testDlgLoc" placeholder="Jaipur"/></div>
+      </div>
+      <div class="field">
+        <label>Testimonial Quote</label>
+        <textarea class="textarea" id="testDlgQuote" placeholder="Their experience in their own words..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Earning Amount</label><input type="text" class="input" id="testDlgEarn" placeholder="₹18,500/mo"/></div>
+        <div class="field">
+          <label>Category</label>
+          <select class="select" id="testDlgCat">
+            <option value="housewives">🏠 Housewife</option>
+            <option value="students">🎓 Student</option>
+            <option value="professionals">💼 Professional</option>
+          </select>
+        </div>
+      </div>
+      <input type="hidden" id="testDlgId"/>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" onclick="closeDlg('testDlg')">Cancel</button>
+      <button class="btn btn-orange" id="testDlgSave">Save Testimonial</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Message Dialog -->
+<div class="dlg-overlay" id="chatDlg">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div class="dlg-head-title" id="chatDlgTitle">Add Chat Message</div>
+      <div class="dlg-x" onclick="closeDlg('chatDlg')">✕</div>
+    </div>
+    <div class="dlg-body">
+      <div class="form-row">
+        <div class="field">
+          <label>Direction</label>
+          <select class="select" id="chatDlgDir">
+            <option value="incoming">Incoming (left / received)</option>
+            <option value="outgoing">Outgoing (right / sent)</option>
+          </select>
+        </div>
+        <div class="field"><label>Sender Name (incoming only)</label><input type="text" class="input" id="chatDlgSender" placeholder="Priya S."/></div>
+      </div>
+      <div class="field">
+        <label>Message Text</label>
+        <textarea class="textarea" id="chatDlgText" rows="2" placeholder="Bhai pehla payment aa gaya! 😭🙏"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Earning Badge (optional)</label><input type="text" class="input" id="chatDlgEarn" placeholder="₹5,200 First Payment"/></div>
+        <div class="field"><label>Time Label</label><input type="text" class="input" id="chatDlgTime" placeholder="9:14 AM"/></div>
+      </div>
+      <input type="hidden" id="chatDlgId"/>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" onclick="closeDlg('chatDlg')">Cancel</button>
+      <button class="btn btn-orange" id="chatDlgSave">Save Message</button>
+    </div>
+  </div>
+</div>
+
+<!-- Marquee Item Dialog -->
+<div class="dlg-overlay" id="marqDlg">
+  <div class="dlg">
+    <div class="dlg-head">
+      <div class="dlg-head-title" id="marqDlgTitle">Add Marquee Item</div>
+      <div class="dlg-x" onclick="closeDlg('marqDlg')">✕</div>
+    </div>
+    <div class="dlg-body">
+      <div class="field"><label>Name (shown in bold)</label><input type="text" class="input" id="marqDlgName" placeholder="Priya S."/></div>
+      <div class="field"><label>Ticker Text</label><input type="text" class="input" id="marqDlgText" placeholder="earned ₹18,500 this month"/></div>
+      <input type="hidden" id="marqDlgId"/>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" onclick="closeDlg('marqDlg')">Cancel</button>
+      <button class="btn btn-orange" id="marqDlgSave">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="dlg-overlay" id="confirmDlg">
+  <div class="dlg" style="max-width:380px">
+    <div class="dlg-head">
+      <div class="dlg-head-title">Confirm Delete</div>
+      <div class="dlg-x" onclick="closeDlg('confirmDlg')">✕</div>
+    </div>
+    <div class="dlg-body">
+      <p style="font-size:.88rem;color:var(--text2)" id="confirmMsg">Are you sure you want to delete this item? This cannot be undone.</p>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" onclick="closeDlg('confirmDlg')">Cancel</button>
+      <button class="btn btn-red" id="confirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Stack -->
+<div class="toast-stack" id="toastStack"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════════ -->
+<script>
+/* ───────────────────────────────────────────────────
+   CONSTANTS & STATE
+   ─────────────────────────────────────────────────── */
+const DATA_KEY   = 'eon_cms_v2';
+const AUTH_KEY   = 'eon_auth_session';
+const CREDS_KEY  = 'eon_admin_creds';
+
+let currentTestTab = 'housewives';
+let confirmCallback = null;
+
+/* ───────────────────────────────────────────────────
+   DEFAULT DATA  (mirrors index.html defaults exactly)
+   ─────────────────────────────────────────────────── */
+const DEFAULTS = {
+  settings:{siteName:'EarnOnline.in',waPhone:'919999999999',waMessage:'Yes, I am interested. Please share more details.'},
+  hero:{headline:'Real People.<br/>Real Income.<br/><span>Real Results.</span>',subheading:'Students, housewives, and working professionals are earning online — from the comfort of their homes.',ctaText:'See Real Proof'},
+  marqueeItems:[
+    {id:'m1',name:'Priya S.',text:'earned ₹18,500 this month'},{id:'m2',name:'Amit K.',text:'earned ₹7,300 last week'},
+    {id:'m3',name:'Sunita R.',text:'First ₹5,000 payment received'},{id:'m4',name:'Ravi M.',text:'₹22,000 in 30 days'},
+    {id:'m5',name:'Kavita P.',text:'earning while at home'},{id:'m6',name:'Deepak S.',text:'₹11,400 extra income'},
+    {id:'m7',name:'Meena T.',text:'First withdrawal done!'},{id:'m8',name:'Vikas N.',text:'₹15,200 this month'}
+  ],
+  videos:[
+    {id:'dv1',name:'Priya Sharma',loc:'Jaipur, Rajasthan',earn:'₹18,500/mo',seed:'v1',duration:'2:34',src:'',section:'grid'},
+    {id:'dv2',name:'Rahul Verma',loc:'Lucknow, UP',earn:'₹9,200/mo',seed:'v2',duration:'3:12',src:'',section:'grid'},
+    {id:'dv3',name:'Anita Devi',loc:'Bhopal, MP',earn:'₹12,800/mo',seed:'v3',duration:'1:58',src:'',section:'grid'},
+    {id:'dv4',name:'Suresh Kumar',loc:'Hyderabad, TS',earn:'₹21,000/mo',seed:'v4',duration:'4:05',src:'',section:'grid'},
+    {id:'dv5',name:'Kavita Singh',loc:'Patna, Bihar',earn:'₹7,600/mo',seed:'v5',duration:'2:48',src:'',section:'grid'},
+    {id:'cr1',name:'Ravi Singh',loc:'Patna, Bihar',earn:'₹16,200/mo',seed:'cr1',duration:'3:20',src:'',section:'carousel'},
+    {id:'cr2',name:'Pooja Gupta',loc:'Kanpur, UP',earn:'₹8,900/mo',seed:'cr2',duration:'2:15',src:'',section:'carousel'},
+    {id:'cr3',name:'Sunil Yadav',loc:'Nagpur, MH',earn:'₹11,600/mo',seed:'cr3',duration:'4:10',src:'',section:'carousel'}
+  ],
+  gallery:[
+    {id:'dg1',label:'₹12,500 earned',seed:'g1',src:''},{id:'dg2',label:'₹8,200 received',seed:'g2',src:''},
+    {id:'dg3',label:'₹21,000/month',seed:'g3',src:''},{id:'dg4',label:'₹5,500 first payout',seed:'g4',src:''},
+    {id:'dg5',label:'₹15,750 earned',seed:'g5',src:''},{id:'dg6',label:'₹9,800 this week',seed:'g6',src:''},
+    {id:'dg7',label:'₹3,200 first payment',seed:'g7',src:''},{id:'dg8',label:'₹18,000/month',seed:'g8',src:''},
+    {id:'dg9',label:'₹11,400 earned',seed:'g9',src:''},{id:'dg10',label:'₹6,700 this month',seed:'g10',src:''}
+  ],
+  testimonials:{
+    housewives:[
+      {id:'h1',name:'Priya S.',loc:'Jaipur',quote:'I never thought I could earn sitting at home. This changed everything for my family.',earn:'₹18,500/mo',seed:'hw1',src:''},
+      {id:'h2',name:'Sunita D.',loc:'Lucknow',quote:'My husband was skeptical but when I showed him the payment, he was shocked!',earn:'₹12,200/mo',seed:'hw2',src:''},
+      {id:'h3',name:'Anita R.',loc:'Bhopal',quote:'I do this between household work. 2-3 hours daily and earning more than expected.',earn:'₹9,400/mo',seed:'hw3',src:''},
+      {id:'h4',name:'Kavita M.',loc:'Indore',quote:'Finally financially independent. I pay for my children\'s school fees myself now.',earn:'₹14,800/mo',seed:'hw4',src:''}
+    ],
+    students:[
+      {id:'s1',name:'Rohit K.',loc:'Delhi',quote:'Paying my own college fees now. Parents are so proud.',earn:'₹7,300/mo',seed:'st1',src:''},
+      {id:'s2',name:'Sneha P.',loc:'Pune',quote:'I study in the morning and earn in the evening. Perfect for college life.',earn:'₹5,900/mo',seed:'st2',src:''},
+      {id:'s3',name:'Arjun S.',loc:'Hyderabad',quote:'Started with zero knowledge. Now earning more than most of my seniors.',earn:'₹8,200/mo',seed:'st3',src:''},
+      {id:'s4',name:'Prachi G.',loc:'Mumbai',quote:'No experience needed. They teach everything step by step.',earn:'₹6,400/mo',seed:'st4',src:''}
+    ],
+    professionals:[
+      {id:'p1',name:'Deepak V.',loc:'Bangalore',quote:'My IT job pays well but this extra income helped me invest for my future.',earn:'₹22,000/mo',seed:'pr1',src:''},
+      {id:'p2',name:'Meena T.',loc:'Chennai',quote:'I work this on weekends. ₹15k extra every month without affecting my job.',earn:'₹15,600/mo',seed:'pr2',src:''},
+      {id:'p3',name:'Vikas N.',loc:'Noida',quote:'My colleagues laughed at me initially. Now they are asking me how to join!',earn:'₹19,200/mo',seed:'pr3',src:''},
+      {id:'p4',name:'Sonia P.',loc:'Gurugram',quote:'More flexible and more rewarding than my 9-to-5.',earn:'₹11,800/mo',seed:'pr4',src:''}
+    ]
+  },
+  chatMessages:[
+    {id:'c1',dir:'incoming',sender:'Priya S.',text:'Bhai pehla payment aa gaya! 😭🙏',time:'9:14 AM',earn:''},
+    {id:'c2',dir:'outgoing',sender:'',text:'Congratulations! Kitna aaya?',time:'9:15 AM',earn:''},
+    {id:'c3',dir:'incoming',sender:'Priya S.',text:'₹5,200 first week mein! Believe nahi ho raha tha',time:'9:15 AM',earn:'₹5,200 First Payment'},
+    {id:'c4',dir:'incoming',sender:'Rahul K.',text:'Finally earning started. Thank you so much 🙏',time:'10:02 AM',earn:''},
+    {id:'c5',dir:'incoming',sender:'Sunita D.',text:'Aaj ₹1,800 ek din mein! Screenshot bhej rahi hoon',time:'11:30 AM',earn:''},
+    {id:'c6',dir:'outgoing',sender:'',text:'Awesome! Keep going 💪',time:'11:31 AM',earn:''},
+    {id:'c7',dir:'incoming',sender:'Arjun S.',text:'30 din mein ₹12,000+ ho gaya. Real hai yaar!',time:'2:15 PM',earn:'₹12,000 in 30 days'},
+    {id:'c8',dir:'incoming',sender:'Kavita M.',text:'Pichle mahine ₹18,500 kamaya. Life change ho gayi 🙌',time:'6:20 PM',earn:'₹18,500 Last Month'}
+  ],
+  carouselVideos:[] // merged into videos with section:'carousel'
+};
+
+/* ───────────────────────────────────────────────────
+   DATA HELPERS
+   ─────────────────────────────────────────────────── */
+function loadData(){
+  try{
+    const raw = localStorage.getItem(DATA_KEY);
+    if(!raw) return deepClone(DEFAULTS);
+    const s = JSON.parse(raw);
+    return {
+      settings:{...DEFAULTS.settings,...(s.settings||{})},
+      hero:{...DEFAULTS.hero,...(s.hero||{})},
+      marqueeItems:s.marqueeItems||deepClone(DEFAULTS.marqueeItems),
+      videos:s.videos||deepClone(DEFAULTS.videos),
+      gallery:s.gallery||deepClone(DEFAULTS.gallery),
+      testimonials:{
+        housewives:s.testimonials?.housewives||deepClone(DEFAULTS.testimonials.housewives),
+        students:s.testimonials?.students||deepClone(DEFAULTS.testimonials.students),
+        professionals:s.testimonials?.professionals||deepClone(DEFAULTS.testimonials.professionals)
+      },
+      chatMessages:s.chatMessages||deepClone(DEFAULTS.chatMessages),
+      carouselVideos:s.carouselVideos||[]
+    };
+  }catch(e){return deepClone(DEFAULTS)}
+}
+
+function saveData(d){
+  localStorage.setItem(DATA_KEY, JSON.stringify(d));
+}
+
+function deepClone(o){return JSON.parse(JSON.stringify(o))}
+function uid(){return 'x'+Date.now().toString(36)+Math.random().toString(36).substr(2,4)}
+
+/* ───────────────────────────────────────────────────
+   AUTH
+   ─────────────────────────────────────────────────── */
+function hashPass(p){ // simple but functional for static hosting
+  let h=0;
+  for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0}
+  return 'eon_'+Math.abs(h).toString(36)+'_'+btoa(p.split('').reverse().join('')).replace(/=/g,'');
+}
+
+function getCreds(){
+  const raw = localStorage.getItem(CREDS_KEY);
+  if(raw) try{return JSON.parse(raw)}catch(e){}
+  return {user:'admin',hash:hashPass('EarnPro@2024')};
+}
+
+function checkAuth(){
+  return sessionStorage.getItem(AUTH_KEY)==='authenticated';
+}
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const creds = getCreds();
+  if(u===creds.user && hashPass(p)===creds.hash){
+    sessionStorage.setItem(AUTH_KEY,'authenticated');
+    sessionStorage.setItem('eon_admin_user', u);
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('app').classList.add('active');
+    document.getElementById('topbarUser').textContent = u;
+    initDashboard();
+    toast('👋 Welcome back, '+u+'!','success');
+  } else {
+    document.getElementById('loginErr').classList.add('show');
+    document.getElementById('loginPass').value='';
+  }
+}
+
+function doLogout(){
+  sessionStorage.removeItem(AUTH_KEY);
+  sessionStorage.removeItem('eon_admin_user');
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').classList.remove('show');
+}
+
+/* ───────────────────────────────────────────────────
+   NAVIGATION
+   ─────────────────────────────────────────────────── */
+const PANEL_TITLES = {
+  dashboard:'Dashboard',hero:'Hero Section',gallery:'Image Gallery',
+  videos:'Video Testimonials',testimonials:'Testimonials',chat:'Chat Messages',
+  marquee:'Marquee Ticker',whatsapp:'WhatsApp CTA',settings:'Site Settings',security:'Security'
+};
+
+function navTo(name){
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.toggle('act',l.dataset.panel===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('act',p.id==='panel-'+name));
+  document.getElementById('panelTitle').textContent = PANEL_TITLES[name]||name;
+  if(name==='gallery') renderGalPanel();
+  if(name==='videos') renderVidPanel();
+  if(name==='testimonials') renderTestPanel();
+  if(name==='chat'){renderChatPanel();renderChatPreview()}
+  if(name==='marquee') renderMarqPanel();
+  if(name==='whatsapp') loadWaPanel();
+  if(name==='settings') loadSettingsPanel();
+  if(name==='hero') loadHeroPanel();
+  if(name==='dashboard') renderDashboard();
+}
+
+/* ───────────────────────────────────────────────────
+   DASHBOARD
+   ─────────────────────────────────────────────────── */
+function renderDashboard(){
+  const d = loadData();
+  const totalTest = d.testimonials.housewives.length+d.testimonials.students.length+d.testimonials.professionals.length;
+  const gridVids = d.videos.filter(v=>v.section==='grid'||!v.section).length;
+  document.getElementById('statsRow').innerHTML = [
+    {icon:'🖼',num:d.gallery.length,lbl:'Gallery Images',delta:'+Live'},
+    {icon:'🎥',num:d.videos.length,lbl:'Total Videos',delta:gridVids+' in grid'},
+    {icon:'💬',num:totalTest,lbl:'Testimonials',delta:'Across 3 categories'},
+    {icon:'📱',num:d.chatMessages.length,lbl:'Chat Messages',delta:'Shown in chat UI'},
+    {icon:'📢',num:d.marqueeItems.length,lbl:'Ticker Items',delta:'Scrolling bar'}
+  ].map(s=>`<div class="stat-card"><div class="stat-card-icon">${s.icon}</div><div class="stat-card-num">${s.num}</div><div class="stat-card-lbl">${s.lbl}</div><div class="stat-card-delta">✦ ${s.delta}</div></div>`).join('');
+}
+
+/* ───────────────────────────────────────────────────
+   GALLERY PANEL
+   ─────────────────────────────────────────────────── */
+function renderGalPanel(){
+  const d = loadData();
+  document.getElementById('galCount').textContent = d.gallery.length;
+  const tbl = document.getElementById('galTable');
+  if(!d.gallery.length){tbl.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px">No images yet. Upload some above.</td></tr>';return}
+  tbl.innerHTML=`<thead><tr><th>#</th><th>Image</th><th>Caption</th><th>ID</th><th>Actions</th></tr></thead><tbody>`
+    +d.gallery.map((item,i)=>{
+      const src = item.src||`https://picsum.photos/seed/${item.seed||item.id}/52/40`;
+      return `<tr>
+        <td style="color:var(--text3)">${i+1}</td>
+        <td><img class="dtable-thumb" src="${src}" alt=""/></td>
+        <td>${item.label||'—'}</td>
+        <td style="color:var(--text3);font-size:.72rem">${item.id}</td>
+        <td><div class="act-btns">
+          <button class="btn btn-blue btn-xs" onclick="editGalItem('${item.id}')">✏️ Edit</button>
+          <button class="btn btn-red btn-xs" onclick="delConfirm('gallery','${item.id}')">🗑</button>
+        </div></td>
+      </tr>`;
+    }).join('')+'</tbody>';
+}
+
+function editGalItem(id){
+  const d=loadData(); const item=d.gallery.find(x=>x.id===id); if(!item)return;
+  document.getElementById('galDlgTitle').textContent='Edit Gallery Image';
+  document.getElementById('galDlgId').value=id;
+  document.getElementById('galDlgUrl').value=item.src||'';
+  document.getElementById('galDlgLabel').value=item.label||'';
+  const pw=document.getElementById('galDlgPreviewWrap');
+  if(item.src){document.getElementById('galDlgPreview').src=item.src;pw.style.display='block'} else pw.style.display='none';
+  openDlg('galDlg');
+}
+
+document.getElementById('galDlgSave').addEventListener('click',()=>{
+  const id=document.getElementById('galDlgId').value;
+  const url=document.getElementById('galDlgUrl').value.trim();
+  const label=document.getElementById('galDlgLabel').value.trim();
+  const d=loadData();
+  if(id){
+    const idx=d.gallery.findIndex(x=>x.id===id);
+    if(idx>-1){d.gallery[idx]={...d.gallery[idx],src:url,label}}
+  } else {
+    d.gallery.push({id:uid(),src:url,label,seed:'u'+Date.now()});
+  }
+  saveData(d); renderGalPanel(); closeDlg('galDlg'); toast('✅ Gallery item saved','success');
+});
+
+// Upload zone
+const galZone=document.getElementById('galUploadZone');
+const galFile=document.getElementById('galFileInput');
+galZone.addEventListener('click',()=>galFile.click());
+galZone.addEventListener('dragover',e=>{e.preventDefault();galZone.classList.add('drag')});
+galZone.addEventListener('dragleave',()=>galZone.classList.remove('drag'));
+galZone.addEventListener('drop',e=>{e.preventDefault();galZone.classList.remove('drag');processGalFiles(e.dataTransfer.files)});
+galFile.addEventListener('change',()=>processGalFiles(galFile.files));
+
+function processGalFiles(files){
+  const prog=document.getElementById('galProg'),bar=document.getElementById('galProgBar');
+  prog.style.display='block';bar.style.width='0%';
+  let done=0; const total=files.length;
+  Array.from(files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const d=loadData();
+      d.gallery.push({id:uid(),src:e.target.result,label:'Payment Proof',seed:'u'+Date.now()});
+      saveData(d);
+      done++;
+      bar.style.width=(done/total*100)+'%';
+      if(done===total){
+        setTimeout(()=>{prog.style.display='none';bar.style.width='0%'},600);
+        renderGalPanel();
+        toast(`✅ ${total} image${total>1?'s':''} uploaded`,'success');
+      }
+    };
+    r.readAsDataURL(f);
+  });
+  galFile.value='';
+}
+
+document.getElementById('galDlgFile').addEventListener('change',function(){
+  if(!this.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    document.getElementById('galDlgUrl').value=e.target.result;
+    document.getElementById('galDlgPreview').src=e.target.result;
+    document.getElementById('galDlgPreviewWrap').style.display='block';
+  };
+  r.readAsDataURL(this.files[0]);
+});
+document.getElementById('galDlgUrl').addEventListener('input',function(){
+  if(this.value){document.getElementById('galDlgPreview').src=this.value;document.getElementById('galDlgPreviewWrap').style.display='block';}
+});
+
+/* ───────────────────────────────────────────────────
+   VIDEO PANEL
+   ─────────────────────────────────────────────────── */
+function renderVidPanel(){
+  const d=loadData();
+  document.getElementById('vidCount').textContent=d.videos.length;
+  const tbl=document.getElementById('vidTable');
+  if(!d.videos.length){tbl.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px">No videos yet.</td></tr>';return}
+  tbl.innerHTML=`<thead><tr><th>#</th><th>Thumb</th><th>Person</th><th>Earning</th><th>Section</th><th>Actions</th></tr></thead><tbody>`
+    +d.videos.map((v,i)=>{
+      const src=v.src||`https://picsum.photos/seed/${v.seed||v.id}/52/40`;
+      const sec=v.section==='carousel'?'<span class="tag tag-blue">Carousel</span>':'<span class="tag tag-orange">Grid</span>';
+      return `<tr>
+        <td style="color:var(--text3)">${i+1}</td>
+        <td><img class="dtable-thumb" src="${src}" alt=""/></td>
+        <td><div style="font-weight:600;font-size:.84rem">${v.name}</div><div style="font-size:.72rem;color:var(--text3)">${v.loc}</div></td>
+        <td style="color:var(--orange);font-weight:600">${v.earn}</td>
+        <td>${sec}</td>
+        <td><div class="act-btns">
+          <button class="btn btn-blue btn-xs" onclick="editVid('${v.id}')">✏️ Edit</button>
+          <button class="btn btn-red btn-xs" onclick="delConfirm('videos','${v.id}')">🗑</button>
+        </div></td>
+      </tr>`;
+    }).join('')+'</tbody>';
+}
+
+function editVid(id){
+  const d=loadData(); const v=d.videos.find(x=>x.id===id); if(!v)return;
+  document.getElementById('vidDlgTitle').textContent='Edit Video';
+  document.getElementById('vidDlgId').value=id;
+  document.getElementById('vidDlgSrc').value=v.src||'';
+  document.getElementById('vidDlgName').value=v.name||'';
+  document.getElementById('vidDlgLoc').value=v.loc||'';
+  document.getElementById('vidDlgEarn').value=v.earn||'';
+  document.getElementById('vidDlgDur').value=v.duration||'';
+  document.getElementById('vidDlgSection').value=v.section||'grid';
+  const pw=document.getElementById('vidDlgPreviewWrap');
+  if(v.src){document.getElementById('vidDlgPreview').src=v.src;pw.style.display='block'} else pw.style.display='none';
+  openDlg('vidDlg');
+}
+
+document.getElementById('vidDlgSave').addEventListener('click',()=>{
+  const id=document.getElementById('vidDlgId').value;
+  const obj={id:id||uid(),src:document.getElementById('vidDlgSrc').value.trim(),name:document.getElementById('vidDlgName').value.trim(),loc:document.getElementById('vidDlgLoc').value.trim(),earn:document.getElementById('vidDlgEarn').value.trim(),duration:document.getElementById('vidDlgDur').value.trim(),section:document.getElementById('vidDlgSection').value,seed:'u'+Date.now()};
+  if(!obj.name){toast('⚠️ Name is required','error');return}
+  const d=loadData();
+  if(id){const idx=d.videos.findIndex(x=>x.id===id);if(idx>-1)d.videos[idx]={...d.videos[idx],...obj}} else d.videos.push(obj);
+  saveData(d);renderVidPanel();closeDlg('vidDlg');toast('✅ Video saved','success');
+});
+
+document.getElementById('vidDlgFile').addEventListener('change',function(){
+  if(!this.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{document.getElementById('vidDlgSrc').value=e.target.result;document.getElementById('vidDlgPreview').src=e.target.result;document.getElementById('vidDlgPreviewWrap').style.display='block'};
+  r.readAsDataURL(this.files[0]);
+});
+document.getElementById('vidDlgSrc').addEventListener('input',function(){
+  if(this.value){document.getElementById('vidDlgPreview').src=this.value;document.getElementById('vidDlgPreviewWrap').style.display='block'}
+});
+
+/* ───────────────────────────────────────────────────
+   TESTIMONIALS PANEL
+   ─────────────────────────────────────────────────── */
+function renderTestPanel(){
+  const d=loadData(); const arr=d.testimonials[currentTestTab]||[];
+  document.getElementById('testPanelTitle').textContent={housewives:'🏠 Housewives',students:'🎓 Students',professionals:'💼 Professionals'}[currentTestTab];
+  const tbl=document.getElementById('testTable');
+  if(!arr.length){tbl.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px">No testimonials in this category.</td></tr>`;return}
+  tbl.innerHTML=`<thead><tr><th>#</th><th>Photo</th><th>Person</th><th>Quote</th><th>Actions</th></tr></thead><tbody>`
+    +arr.map((t,i)=>{
+      const src=t.src||`https://picsum.photos/seed/${t.seed||t.id}/36/36`;
+      return `<tr>
+        <td style="color:var(--text3)">${i+1}</td>
+        <td><img class="dtable-av" src="${src}" alt=""/></td>
+        <td><div style="font-weight:600;font-size:.84rem">${t.name}</div><div style="font-size:.72rem;color:var(--text3)">${t.loc} · <span style="color:var(--orange)">${t.earn}</span></div></td>
+        <td style="max-width:280px;font-size:.8rem;color:var(--text3)">"${(t.quote||'').substring(0,80)}${t.quote&&t.quote.length>80?'…':''}"</td>
+        <td><div class="act-btns">
+          <button class="btn btn-blue btn-xs" onclick="editTest('${currentTestTab}','${t.id}')">✏️ Edit</button>
+          <button class="btn btn-red btn-xs" onclick="delConfirm('testimonials','${t.id}','${currentTestTab}')">🗑</button>
+        </div></td>
+      </tr>`;
+    }).join('')+'</tbody>';
+}
+
+document.getElementById('testTabBar').querySelectorAll('button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#testTabBar button').forEach(b=>{b.classList.remove('btn-orange');b.classList.add('btn-ghost')});
+    btn.classList.remove('btn-ghost');btn.classList.add('btn-orange');
+    currentTestTab=btn.dataset.tc;renderTestPanel();
+  });
+});
+
+function editTest(cat,id){
+  const d=loadData(); const arr=d.testimonials[cat]; const t=arr.find(x=>x.id===id); if(!t)return;
+  document.getElementById('testDlgTitle').textContent='Edit Testimonial';
+  document.getElementById('testDlgId').value=id;
+  document.getElementById('testDlgSrc').value=t.src||'';
+  document.getElementById('testDlgName').value=t.name||'';
+  document.getElementById('testDlgLoc').value=t.loc||'';
+  document.getElementById('testDlgQuote').value=t.quote||'';
+  document.getElementById('testDlgEarn').value=t.earn||'';
+  document.getElementById('testDlgCat').value=cat;
+  const pw=document.getElementById('testDlgPreviewWrap');
+  if(t.src){document.getElementById('testDlgPreview').src=t.src;pw.style.display='block'} else pw.style.display='none';
+  openDlg('testDlg');
+}
+
+document.getElementById('testDlgSave').addEventListener('click',()=>{
+  const id=document.getElementById('testDlgId').value;
+  const cat=document.getElementById('testDlgCat').value;
+  const obj={id:id||uid(),src:document.getElementById('testDlgSrc').value.trim(),name:document.getElementById('testDlgName').value.trim(),loc:document.getElementById('testDlgLoc').value.trim(),quote:document.getElementById('testDlgQuote').value.trim(),earn:document.getElementById('testDlgEarn').value.trim(),seed:'u'+Date.now()};
+  if(!obj.name||!obj.quote){toast('⚠️ Name and quote are required','error');return}
+  const d=loadData();
+  if(id){
+    // might be moving category
+    ['housewives','students','professionals'].forEach(c=>{const i=d.testimonials[c].findIndex(x=>x.id===id);if(i>-1)d.testimonials[c].splice(i,1)});
+  }
+  d.testimonials[cat].push(obj);
+  saveData(d);currentTestTab=cat;renderTestPanel();closeDlg('testDlg');toast('✅ Testimonial saved','success');
+});
+
+document.getElementById('testDlgFile').addEventListener('change',function(){
+  if(!this.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{document.getElementById('testDlgSrc').value=e.target.result;document.getElementById('testDlgPreview').src=e.target.result;document.getElementById('testDlgPreviewWrap').style.display='block'};
+  r.readAsDataURL(this.files[0]);
+});
+
+/* ───────────────────────────────────────────────────
+   CHAT PANEL
+   ─────────────────────────────────────────────────── */
+function renderChatPanel(){
+  const d=loadData();
+  document.getElementById('chatCount').textContent=d.chatMessages.length;
+  const tbl=document.getElementById('chatTable');
+  if(!d.chatMessages.length){tbl.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:32px">No messages yet.</td></tr>';return}
+  tbl.innerHTML=`<thead><tr><th>Dir</th><th>Sender</th><th>Message</th><th>Actions</th></tr></thead><tbody>`
+    +d.chatMessages.map(m=>{
+      const dir=m.dir==='incoming'?'<span class="tag tag-blue">←In</span>':'<span class="tag tag-green">Out→</span>';
+      return `<tr>
+        <td>${dir}</td>
+        <td style="font-size:.8rem">${m.sender||'—'}</td>
+        <td style="font-size:.8rem;max-width:200px;color:var(--text2)">${(m.text||'').substring(0,50)}${m.text&&m.text.length>50?'…':''}${m.earn?` <span class="tag tag-orange" style="font-size:.65rem">${m.earn}</span>`:''}</td>
+        <td><div class="act-btns">
+          <button class="btn btn-blue btn-xs" onclick="editChat('${m.id}')">✏️</button>
+          <button class="btn btn-red btn-xs" onclick="delConfirm('chat','${m.id}')">🗑</button>
+          <button class="btn btn-ghost btn-xs" onclick="moveChatMsg('${m.id}',-1)" title="Move up">↑</button>
+          <button class="btn btn-ghost btn-xs" onclick="moveChatMsg('${m.id}',1)" title="Move down">↓</button>
+        </div></td>
+      </tr>`;
+    }).join('')+'</tbody>';
+}
+
+function renderChatPreview(){
+  const d=loadData();
+  const prev=document.getElementById('chatPreview');
+  prev.innerHTML=d.chatMessages.map(m=>`
+    <div class="cprev ${m.dir}">
+      ${m.dir==='incoming'&&m.sender?`<div class="cprev-sender">${m.sender}</div>`:''}
+      <div class="cprev-bubble">${m.text}</div>
+      ${m.earn?`<div class="cprev-earn">💸 ${m.earn}</div>`:''}
+    </div>`).join('');
+  setTimeout(()=>prev.scrollTop=prev.scrollHeight,80);
+}
+
+function editChat(id){
+  const d=loadData(); const m=d.chatMessages.find(x=>x.id===id); if(!m)return;
+  document.getElementById('chatDlgTitle').textContent='Edit Message';
+  document.getElementById('chatDlgId').value=id;
+  document.getElementById('chatDlgDir').value=m.dir;
+  document.getElementById('chatDlgSender').value=m.sender||'';
+  document.getElementById('chatDlgText').value=m.text||'';
+  document.getElementById('chatDlgEarn').value=m.earn||'';
+  document.getElementById('chatDlgTime').value=m.time||'';
+  openDlg('chatDlg');
+}
+
+function moveChatMsg(id,dir){
+  const d=loadData(); const arr=d.chatMessages; const i=arr.findIndex(x=>x.id===id);
+  if(i<0)return; const ni=i+dir;
+  if(ni<0||ni>=arr.length)return;
+  [arr[i],arr[ni]]=[arr[ni],arr[i]];
+  saveData(d);renderChatPanel();renderChatPreview();
+}
+
+document.getElementById('chatDlgSave').addEventListener('click',()=>{
+  const id=document.getElementById('chatDlgId').value;
+  const obj={id:id||uid(),dir:document.getElementById('chatDlgDir').value,sender:document.getElementById('chatDlgSender').value.trim(),text:document.getElementById('chatDlgText').value.trim(),earn:document.getElementById('chatDlgEarn').value.trim(),time:document.getElementById('chatDlgTime').value.trim()||new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})};
+  if(!obj.text){toast('⚠️ Message text required','error');return}
+  const d=loadData();
+  if(id){const idx=d.chatMessages.findIndex(x=>x.id===id);if(idx>-1)d.chatMessages[idx]={...d.chatMessages[idx],...obj}}
+  else d.chatMessages.push(obj);
+  saveData(d);renderChatPanel();renderChatPreview();closeDlg('chatDlg');toast('✅ Message saved','success');
+});
+
+/* ───────────────────────────────────────────────────
+   MARQUEE PANEL
+   ─────────────────────────────────────────────────── */
+function renderMarqPanel(){
+  const d=loadData();
+  document.getElementById('marqCount').textContent=d.marqueeItems.length;
+  const tbl=document.getElementById('marqTable');
+  if(!d.marqueeItems.length){tbl.innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:32px">No items.</td></tr>';return}
+  tbl.innerHTML=`<thead><tr><th>Name</th><th>Text</th><th>Actions</th></tr></thead><tbody>`
+    +d.marqueeItems.map(m=>`<tr>
+      <td style="font-weight:600">${m.name}</td>
+      <td style="color:var(--text2)">${m.text}</td>
+      <td><div class="act-btns">
+        <button class="btn btn-blue btn-xs" onclick="editMarq('${m.id}')">✏️</button>
+        <button class="btn btn-red btn-xs" onclick="delConfirm('marquee','${m.id}')">🗑</button>
+      </div></td>
+    </tr>`).join('')+'</tbody>';
+}
+
+function editMarq(id){
+  const d=loadData(); const m=d.marqueeItems.find(x=>x.id===id); if(!m)return;
+  document.getElementById('marqDlgTitle').textContent='Edit Marquee Item';
+  document.getElementById('marqDlgId').value=id;
+  document.getElementById('marqDlgName').value=m.name||'';
+  document.getElementById('marqDlgText').value=m.text||'';
+  openDlg('marqDlg');
+}
+
+document.getElementById('marqDlgSave').addEventListener('click',()=>{
+  const id=document.getElementById('marqDlgId').value;
+  const obj={id:id||uid(),name:document.getElementById('marqDlgName').value.trim(),text:document.getElementById('marqDlgText').value.trim()};
+  if(!obj.name||!obj.text){toast('⚠️ Both fields required','error');return}
+  const d=loadData();
+  if(id){const idx=d.marqueeItems.findIndex(x=>x.id===id);if(idx>-1)d.marqueeItems[idx]={...d.marqueeItems[idx],...obj}}
+  else d.marqueeItems.push(obj);
+  saveData(d);renderMarqPanel();closeDlg('marqDlg');toast('✅ Ticker item saved','success');
+});
+
+/* ───────────────────────────────────────────────────
+   HERO PANEL
+   ─────────────────────────────────────────────────── */
+function loadHeroPanel(){
+  const d=loadData();
+  document.getElementById('heroHeadline').value=d.hero.headline||'';
+  document.getElementById('heroSubheading').value=d.hero.subheading||'';
+  document.getElementById('heroCtaText').value=d.hero.ctaText||'';
+}
+
+document.getElementById('saveHeroBtn').addEventListener('click',()=>{
+  const d=loadData();
+  d.hero.headline=document.getElementById('heroHeadline').value.trim();
+  d.hero.subheading=document.getElementById('heroSubheading').value.trim();
+  d.hero.ctaText=document.getElementById('heroCtaText').value.trim();
+  saveData(d);toast('✅ Hero section saved. Reload public page to see changes.','success');
+});
+
+/* ───────────────────────────────────────────────────
+   WHATSAPP PANEL
+   ─────────────────────────────────────────────────── */
+function loadWaPanel(){
+  const d=loadData();
+  document.getElementById('waPhone').value=d.settings.waPhone||'';
+  document.getElementById('waMessage').value=d.settings.waMessage||'';
+  updateWaPreview();
+}
+
+function updateWaPreview(){
+  const p=document.getElementById('waPhone').value.trim()||'919999999999';
+  const m=document.getElementById('waMessage').value.trim()||'Hello';
+  document.getElementById('waLinkPreview').textContent=`https://wa.me/${p}?text=${encodeURIComponent(m)}`;
+}
+
+document.getElementById('waPhone').addEventListener('input',updateWaPreview);
+document.getElementById('waMessage').addEventListener('input',updateWaPreview);
+
+document.getElementById('saveWaBtn').addEventListener('click',()=>{
+  const d=loadData();
+  d.settings.waPhone=document.getElementById('waPhone').value.trim();
+  d.settings.waMessage=document.getElementById('waMessage').value.trim();
+  saveData(d);toast('✅ WhatsApp settings saved. All CTA buttons updated.','success');
+});
+
+/* ───────────────────────────────────────────────────
+   SETTINGS PANEL
+   ─────────────────────────────────────────────────── */
+function loadSettingsPanel(){
+  const d=loadData();
+  document.getElementById('siteName').value=d.settings.siteName||'';
+}
+
+document.getElementById('saveSettingsBtn').addEventListener('click',()=>{
+  const d=loadData();
+  d.settings.siteName=document.getElementById('siteName').value.trim()||'EarnOnline.in';
+  saveData(d);toast('✅ Settings saved','success');
+});
+
+document.getElementById('resetDataBtn').addEventListener('click',()=>{
+  confirmCallback=()=>{
+    localStorage.removeItem(DATA_KEY);
+    toast('🗑 All data reset to defaults','success');
+    initDashboard();
+  };
+  document.getElementById('confirmMsg').textContent='This will reset ALL content to defaults. This cannot be undone. Are you sure?';
+  openDlg('confirmDlg');
+});
+
+/* ───────────────────────────────────────────────────
+   SECURITY / CHANGE PASSWORD
+   ─────────────────────────────────────────────────── */
+document.getElementById('changePassBtn').addEventListener('click',()=>{
+  const cur=document.getElementById('curPass').value;
+  const np=document.getElementById('newPass').value;
+  const cp=document.getElementById('confPass').value;
+  const creds=getCreds();
+  if(hashPass(cur)!==creds.hash){toast('❌ Current password is incorrect','error');return}
+  if(np.length<8){toast('⚠️ New password must be at least 8 characters','error');return}
+  if(np!==cp){toast('⚠️ Passwords do not match','error');return}
+  localStorage.setItem(CREDS_KEY,JSON.stringify({user:creds.user,hash:hashPass(np)}));
+  ['curPass','newPass','confPass'].forEach(id=>document.getElementById(id).value='');
+  toast('✅ Password changed successfully','success');
+});
+
+/* ───────────────────────────────────────────────────
+   DELETE CONFIRM
+   ─────────────────────────────────────────────────── */
+function delConfirm(type,id,subcat){
+  confirmCallback=()=>doDelete(type,id,subcat);
+  document.getElementById('confirmMsg').textContent='Delete this item? This cannot be undone.';
+  openDlg('confirmDlg');
+}
+
+function doDelete(type,id,subcat){
+  const d=loadData();
+  if(type==='gallery'){d.gallery=d.gallery.filter(x=>x.id!==id)}
+  else if(type==='videos'){d.videos=d.videos.filter(x=>x.id!==id)}
+  else if(type==='testimonials'){if(subcat)d.testimonials[subcat]=d.testimonials[subcat].filter(x=>x.id!==id)}
+  else if(type==='chat'){d.chatMessages=d.chatMessages.filter(x=>x.id!==id)}
+  else if(type==='marquee'){d.marqueeItems=d.marqueeItems.filter(x=>x.id!==id)}
+  saveData(d);
+  if(type==='gallery')renderGalPanel();
+  if(type==='videos')renderVidPanel();
+  if(type==='testimonials')renderTestPanel();
+  if(type==='chat'){renderChatPanel();renderChatPreview()}
+  if(type==='marquee')renderMarqPanel();
+  toast('🗑 Item deleted','success');
+}
+
+document.getElementById('confirmOk').addEventListener('click',()=>{
+  if(confirmCallback){confirmCallback();confirmCallback=null}
+  closeDlg('confirmDlg');
+});
+
+/* ───────────────────────────────────────────────────
+   DIALOG HELPERS
+   ─────────────────────────────────────────────────── */
+function openDlg(id){document.getElementById(id).classList.add('open')}
+function closeDlg(id){
+  document.getElementById(id).classList.remove('open');
+  // Reset fields
+  document.querySelectorAll(`#${id} input[type="text"],#${id} input[type="hidden"],#${id} textarea`).forEach(el=>el.value='');
+  document.querySelectorAll(`#${id} [id$="PreviewWrap"]`).forEach(el=>el.style.display='none');
+}
+
+// Open "add" dialogs
+document.getElementById('openGalDlgBtn').addEventListener('click',()=>{document.getElementById('galDlgTitle').textContent='Add Gallery Image';openDlg('galDlg')});
+document.getElementById('openVidDlgBtn').addEventListener('click',()=>{document.getElementById('vidDlgTitle').textContent='Add Video';openDlg('vidDlg')});
+document.getElementById('openTestDlgBtn').addEventListener('click',()=>{document.getElementById('testDlgTitle').textContent='Add Testimonial';document.getElementById('testDlgCat').value=currentTestTab;openDlg('testDlg')});
+document.getElementById('openChatDlgBtn').addEventListener('click',()=>{document.getElementById('chatDlgTitle').textContent='Add Chat Message';openDlg('chatDlg')});
+document.getElementById('openMarqDlgBtn').addEventListener('click',()=>{document.getElementById('marqDlgTitle').textContent='Add Marquee Item';openDlg('marqDlg')});
+
+// Close on overlay click
+document.querySelectorAll('.dlg-overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{if(e.target===ov)closeDlg(ov.id)});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.dlg-overlay.open').forEach(ov=>closeDlg(ov.id));
+});
+
+/* ───────────────────────────────────────────────────
+   TOAST
+   ─────────────────────────────────────────────────── */
+function toast(msg,type='success'){
+  const stack=document.getElementById('toastStack');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${type==='success'?'✅':'⚠️'}</span><span>${msg}</span>`;
+  stack.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350)},3200);
+}
+
+/* ───────────────────────────────────────────────────
+   NAVIGATION SETUP
+   ─────────────────────────────────────────────────── */
+document.querySelectorAll('.sb-link').forEach(l=>{
+  l.addEventListener('click',()=>navTo(l.dataset.panel));
+});
+
+/* ───────────────────────────────────────────────────
+   LOGIN SETUP
+   ─────────────────────────────────────────────────── */
+document.getElementById('loginBtn').addEventListener('click',doLogin);
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginPass').focus()});
+document.getElementById('logoutBtn').addEventListener('click',doLogout);
+
+/* ───────────────────────────────────────────────────
+   INIT
+   ─────────────────────────────────────────────────── */
+function initDashboard(){
+  navTo('dashboard');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  if(checkAuth()){
+    const u=sessionStorage.getItem('eon_admin_user')||'admin';
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('app').classList.add('active');
+    document.getElementById('topbarUser').textContent=u;
+    initDashboard();
+  }
+});
+</script>
+</body>
+</html>
